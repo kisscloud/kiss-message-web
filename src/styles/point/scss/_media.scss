@@ -1,0 +1,20 @@
+/* ## Media
+---------------------------------*/
+.img-fluid {
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+}
+
+.img-rounded {
+  border-radius: $border-radius-base;
+}
+
+.img-circle {
+  border-radius: 1993px;
+}
+
+// embed
+.embed-fluid {
+  @include embed-ratio(16, 9);
+}

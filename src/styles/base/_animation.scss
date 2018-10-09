@@ -1,0 +1,97 @@
+// slide
+.slideup-enter-active,
+.slideup2-enter-active,
+.slideleft-enter-active,
+.slideleft2-enter-active,
+.slideright-enter-active,
+.slideright2-enter-active,
+.slidedown-enter-active,
+.slidedown2-enter-active,
+.slideup-leave-active,
+.slideup2-leave-active,
+.slideleft-leave-active,
+.slideleft2-leave-active,
+.slideright-leave-active,
+.slideright2-leave-active,
+.slidedown-leave-active,
+.slidedown2-leave-active {
+  transition: opacity 300ms, transform 400ms ease;
+  will-change: opacity, transform;
+}
+
+// slideup
+.slideup-enter,
+.slideup2-enter,
+.slideup-leave-to {
+  opacity: 0.01;
+  transform: translate3d(0, 30%, 0);
+}
+
+.slideup2-leave-to {
+  opacity: 0.01;
+  transform: translate3d(0, -30%, 0);
+}
+
+// slideleft
+.slideleft-enter,
+.slideleft2-enter,
+.slideleft-leave-to {
+  opacity: 0.01;
+  transform: translate3d(75%, 0, 0);
+}
+
+.slideleft2-leave-to {
+  opacity: 0.01;
+  transform: translate3d(-35%, 0, 0);
+}
+
+// slideright
+.slideright-enter,
+.slideright2-enter,
+.slideright-leave-to {
+  opacity: 0.01;
+  transform: translate3d(-75%, 0, 0);
+}
+
+.slideright2-leave-to {
+  opacity: 0.01;
+  transform: translate3d(35%, 0, 0);
+}
+
+// slidedown
+.slidedown-enter,
+.slidedown2-enter,
+.slidedown-leave-to {
+  opacity: 0.01;
+  transform: translate3d(0, -30%, 0);
+}
+
+.slidedown2-leave-to {
+  opacity: 0.01;
+  transform: translate3d(0, 30%, 0);
+}
+
+// fade
+.fade-enter,
+.fade-leave-to {
+  opacity: 0.01;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 300ms;
+  will-change: opacity;
+}
+
+// zoom
+.zoom-enter,
+.zoom-leave-to {
+  opacity: 0.01;
+  transform: scale(0.75);
+}
+
+.zoom-enter-active,
+.zoom-leave-active {
+  transition: opacity 300ms, transform 400ms ease;
+  will-change: opacity, transform;
+}

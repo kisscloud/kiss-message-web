@@ -1,0 +1,61 @@
+@import 'variables';
+
+.divider {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 16px 0;
+  &::before {
+    content: " ";
+    display: block;
+    height: 1px;
+    flex: 1 1 0%;
+    min-width: 0;
+    background-color: $divider-color;
+  }
+  &::after {
+    content: " ";
+    display: block;
+    height: 1px;
+    flex: 1 1 0%;
+    min-width: 0;
+    background-color: $divider-color;
+  }
+  > span {
+    padding: 0 8px;
+  }
+}
+
+.divider.divider--vertical {
+  display: inline-flex;
+  height: 100%;
+  margin: 0 16px;
+  flex-direction: column;
+  &::before {
+    width: 1px;
+    height: auto;
+    min-height: 16px;
+  }
+  &::after {
+    width: 1px;
+    height: auto;
+    min-height: 16px;
+  }
+  > span {
+    writing-mode: vertical-lr;
+    padding: 8px 0;
+  }
+}
+
+.divider.divider--start {
+  &::before {
+    display: none;
+  }
+}
+
+.divider.divider--end {
+  &::after {
+    display: none;
+  }
+}

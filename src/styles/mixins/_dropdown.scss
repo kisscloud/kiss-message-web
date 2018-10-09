@@ -1,0 +1,7 @@
+@mixin dropbox() {
+  min-width: $dropdown-content-min-width;
+  background-color: $dropdown-content-bg-color;
+  box-shadow: 0 2px 6px 1px rgba($color-black, 0.08);
+  border: $dropdown-content-border-width solid $dropdown-content-border-color;
+  border-radius: $dropdown-content-border-radius;
+}

@@ -1,0 +1,49 @@
+.avatar {
+  position: relative;
+  display: inline-block;
+  margin: 0;
+  width: 36px;
+  height: 36px;
+  vertical-align: middle;
+  border-radius: 1993px;
+  object-fit: cover;
+  @include full-bg;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+}
+
+.avatar {
+  &.avatar--xs {
+    width: 20px;
+    height: 20px;
+  }
+
+  &.avatar--sm {
+    width: 28px;
+    height: 28px;
+  }
+
+  &.avatar--md {
+    width: 48px;
+    height: 48px;
+  }
+
+  &.avatar--lg {
+    width: 64px;
+    height: 64px;
+  }
+
+  &.avatar--xl {
+    width: 96px;
+    height: 96px;
+  }
+
+  &.avatar--rounded {
+    border-radius: 3px;
+  }
+}
+

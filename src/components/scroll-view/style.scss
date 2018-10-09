@@ -1,0 +1,86 @@
+.scroll-view {
+  position: relative;
+  overflow: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scroll-view__content {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  box-sizing: content-box;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar,
+  &::-webkit-scrollbar-thumb {
+    display: none;
+  }
+}
+
+.scroll-view__track {
+  position: absolute;
+  z-index: 15;
+}
+
+.scroll-view__scrollbar {
+  position: absolute;
+  opacity: 0;
+  transition: opacity 200ms linear;
+  &::before {
+    content: '';
+    position: absolute;
+    border-radius: 7px;
+    background-color: #000;
+  }
+}
+
+.scroll-view__track.scroll-view__track--horizontal {
+  width: 100%;
+  height: 11px;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  .scroll-view__scrollbar {
+    left: 0;
+    bottom: 2px;
+    height: 7px;
+    min-width: 10px;
+    &::before {
+      left: 2px;
+      right: 2px;
+      top: 0;
+      bottom: 0;
+    }
+  }
+}
+
+.scroll-view__track.scroll-view__track--vertical {
+  width: 11px;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  .scroll-view__scrollbar {
+    top: 0;
+    right: 2px;
+    width: 7px;
+    min-height: 10px;
+    &::before {
+      top: 2px;
+      bottom: 2px;
+      left: 0;
+      right: 0;
+    }
+  }
+}
+
+.scroll-view__track:hover .scroll-view__scrollbar,
+.scroll-view__scrollbar.is-visible {
+  opacity: 0.75;
+  transition: opacity 0 linear;
+}
+
+.scroll-view.scroll-view--light {
+  .scroll-view__scrollbar::before {
+    background-color: #fff;
+  }
+}

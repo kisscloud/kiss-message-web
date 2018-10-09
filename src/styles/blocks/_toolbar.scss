@@ -1,0 +1,48 @@
+// .toolbar
+//   .toolbar__group
+//     .toolbar__title
+//
+// @modifiers: .toolbar--ghost
+
+// block
+.toolbar {
+  position: relative;
+  padding: $toolbar-padding;
+  background-color: $toolbar-bg;
+  margin-bottom: $toolbar-margin-bottom;
+}
+
+.toolbar__group {
+  &:not(:last-child) {
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid $divider-color;
+  }
+}
+
+.toolbar__title {
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: normal;
+  margin: 0;
+  max-width: 100%;
+  word-wrap: normal;
+  text-overflow: ellipsis;
+  span {
+    display: block;
+    font-size: 14px;
+    margin-top: 4px;
+    color: $muted-color;
+  }
+  small {
+    margin-left: 8px;
+    font-size: 14px;
+    color: $muted-color;
+  }
+}
+
+// modifiers
+.toolbar.toolbar--ghost {
+  padding: 0;
+  background-color: transparent;
+}

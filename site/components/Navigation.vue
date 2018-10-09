@@ -1,0 +1,46 @@
+<template>
+  <c-menu theme="dark" :activeIndex="$route.path" @select="onSelect">
+    <c-menu-heading label="概览" />
+    <c-menu-item index="/" icon="icon-compass2" label="主面板" />
+    <c-menu-item index="/dev/dashboard" icon="icon-compass2" label="开发工作台" />
+    <!-- <c-menu-item index="/dev/dashboard" icon="icon-compass2" label="运营工作台" />
+    <c-menu-item index="/dev/dashboard" icon="icon-compass2" label="引擎概览" />
+    <c-menu-item index="/dev/dashboard" icon="icon-compass2" label="钱包概览" /> -->
+    <c-menu-divider />
+    <c-menu-heading label="应用管理" />
+    <c-submenu index="pages" icon="icon-user" label="交易引擎">
+      <c-menu-item index="/dev/projects" label="币种" />
+      <c-menu-item index="/dev/prds" label="交易对" />
+      <c-menu-item index="/dev/tests" label="行情" />
+      <!-- <c-menu-item index="/permission/roles" label="代码仓库" /> -->
+    </c-submenu>
+    <c-submenu index="pages" icon="icon-user" label="开发平台">
+      <c-menu-item index="/dev/projects" label="项目管理" />
+      <c-menu-item index="/dev/prds" label="需求管理" />
+      <c-menu-item index="/dev/tests" label="项目测试" />
+      <c-menu-item index="/dev/compile" label="编译构建" />
+      <c-menu-item index="/dev/deploy" label="项目部署" />
+      <c-menu-item index="/dev/documents" label="文档中心" />
+      <!-- <c-menu-item index="/permission/roles" label="代码仓库" /> -->
+    </c-submenu>
+    <c-menu-heading label="系统管理" />
+    <c-submenu index="pages" icon="icon-user" label="权限管理">
+      <c-menu-item index="/permission/users" label="用户管理" />
+      <c-menu-item index="/permission/roles" label="角色管理" />
+      <c-menu-item index="/permission/permissions" label="权限管理" />
+      <c-menu-item index="/permission/logs" label="操作日志" />
+    </c-submenu>
+    <!-- <c-menu-item icon="icon-wrench" index="/utilities" label="开发文档" /> -->
+  </c-menu>
+</template>
+
+<script>
+export default {
+  name: 'Navigation',
+  methods: {
+    onSelect(index) {
+      this.$router.push(index);
+    }
+  }
+};
+</script>

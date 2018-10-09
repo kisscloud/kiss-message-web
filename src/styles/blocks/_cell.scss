@@ -1,0 +1,89 @@
+// .cell
+//   .cell__media
+//   .cell__content
+//     .cell__header
+//       .cell__leading
+//         .cell__title
+//       .cell__after
+//     .cell__body
+//   .cell__after
+//
+// @modifers: .cell--start
+.cell-list {
+  .cell:not(:last-child) {
+    margin-bottom: 16px;
+  }
+}
+
+// block
+.cell {
+  display: flex;
+  align-items: center;
+}
+
+// elements
+.cell__media {
+  flex-shrink: 0;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.cell__content {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+.cell__media + .cell__content,
+.cell__content + .cell__media {
+  margin-left: 12px;
+}
+
+.cell__header {
+  display: flex;
+  align-items: center;
+}
+
+.cell__title {
+  font-size: 14px;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.cell__body {
+  font-size: 14px;
+  line-height: 18px;
+  p {
+    margin-bottom: 8px;
+  }
+}
+
+.cell__after {
+  flex-shrink: 0;
+  margin-left: 6px;
+  color: $muted-color;
+  font-size: 75%;
+}
+
+.cell__header .cell__leading {
+  flex: 1 1 0%;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  @include oneline;
+  .cell__title {
+    font-weight: bolder;
+    margin-right: 8px;
+  }
+}
+
+.cell__header .cell__after {
+  margin-left: $space-inline-s;
+}
+
+// modifiers
+.cell--start {
+  align-items: flex-start;
+  > .cell__after {
+    align-self: center;
+  }
+}

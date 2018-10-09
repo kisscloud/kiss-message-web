@@ -1,0 +1,322 @@
+@import 'variables';
+
+.menu {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+}
+
+.menu__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: $menu-heading-color;
+  font-size: 13px;
+  line-height: 16px;
+  margin-bottom: 4px;
+  span {
+    flex: 1 1 0%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .menu__action {
+    flex-shrink: 0;
+    margin-left: 8px;
+    text-align: right;
+    color: $menu-muted-color;
+  }
+}
+
+.menu__item {
+  position: relative;
+  margin-bottom: 2px;
+  &.has-children {
+    > .menu__link {
+      padding-right: 24px;
+      &::after {
+        content: '';
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        margin-top: -3px;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 4px 0 4px 4px;
+        border-color: transparent transparent transparent $menu-arrow-color;
+        &.is-active {
+          border-color: $menu-active-arrow-color transparent transparent transparent;
+        }
+      }
+    }
+  }
+  &.is-open {
+    > .menu__link {
+      &::after {
+        margin-top: -2px;
+        margin-right: -2px;
+        border-width: 4px 4px 0 4px;
+        border-color: $menu-arrow-color transparent transparent transparent;
+        &.is-active {
+          border-color: $menu-active-arrow-color transparent transparent transparent;
+        }
+      }
+    }
+
+    > .menu__sub {
+      display: block;
+    }
+  }
+}
+
+.menu__link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  color: $menu-color;
+  line-height: 20px;
+  padding: 7px 8px;
+  border-radius: 2px;
+  cursor: pointer;
+  overflow: hidden;
+  &:hover {
+    color: $menu-hover-color;
+    background-color: $menu-hover-bg;
+  }
+  &.is-active {
+    color: $menu-active-color;
+    background-color: $menu-active-bg;
+    .menu__after {
+      color: $menu-active-muted-color;
+    }
+  }
+  .menu__icon {
+    display: block;
+    flex-shrink: 0;
+    line-height: 1;
+    width: 20px;
+    text-align: center;
+    margin-right: 8px;
+  }
+  .menu__label {
+    display: block;
+    flex: 1 1 0%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .menu__after {
+    display: block;
+    flex-shrink: 0;
+    margin-left: 8px;
+    color: $menu-muted-color;
+  }
+}
+
+.menu__divider {
+  margin: 16px 8px;
+  height: 1px;
+  background-color: $menu-divider-bg;
+}
+
+.menu__sub {
+  display: none;
+  margin: 4px 0 16px 17px;
+  padding: 0 0 0 10px;
+  list-style: none;
+  border-left: 1px solid $menu-line-color;
+  .menu__link {
+    padding: 5px 8px;
+  }
+  .menu__icon {
+    display: none;
+  }
+  .menu__sub {
+    margin: 0 0 8px 12px;
+    padding: 0 0 0 5px;
+  }
+}
+
+@mixin menu-variant(
+  $heading-color,
+
+  $color,
+  $hover-color,
+  $hover-bg,
+  $active-color,
+  $active-bg,
+
+  $muted-color,
+  $active-muted-color,
+
+  $arrow-color,
+  $active-arrow-color,
+
+  $divider-color,
+  $line-color
+) {
+
+  .menu__heading {
+    color: $heading-color;
+    .menu__action {
+      color: $muted-color;
+    }
+  }
+
+  .menu__item {
+    &.has-children {
+      > .menu__link {
+        &::after {
+          border-color: transparent transparent transparent $arrow-color;
+        }
+        &.is-active {
+          border-color: transparent transparent transparent $active-arrow-color;
+        }
+      }
+    }
+    &.is-open {
+      > .menu__link {
+        &::after {
+          border-color: $arrow-color transparent transparent transparent;
+        }
+        &.is-active {
+           border-color: $active-arrow-color transparent transparent transparent;
+        }
+      }
+    }
+  }
+
+  .menu__link {
+    color: $color;
+    &:hover {
+      color: $hover-color;
+      background-color: $hover-bg;
+    }
+    &.is-active {
+      color: $active-color;
+      background-color: $active-bg;
+      .menu__after {
+        color: $active-muted-color;
+      }
+    }
+    .menu__after {
+      color: $muted-color;
+    }
+  }
+
+  .menu__divider {
+    background-color: $divider-color;
+  }
+
+  .menu__sub {
+    border-color: $line-color;
+  }
+}
+
+// theme modifiers
+.menu.menu--light {
+  @include menu-variant(
+    $heading-color: rgba($color-white, 0.75),
+
+    $color: rgba($color-white, 0.85),
+    $hover-color: rgba($color-white, 1),
+    $hover-bg: rgba($color-white, 0.05),
+    $active-color: rgba($color-white, 1),
+    $active-bg: rgba($color-white, 0.1),
+
+    $muted-color: rgba($color-white, 0.65),
+    $active-muted-color: rgba($color-white, 0.75),
+
+    $arrow-color: rgba($color-white, 0.5),
+    $active-arrow-color: rgba($color-white, 0.5),
+
+    $divider-color: rgba($color-white, 0.1),
+    $line-color: rgba($color-white, 0.1)
+  );
+}
+
+.menu.menu--dark {
+  @include menu-variant(
+    $heading-color: rgba($color-white, 0.35),
+
+    $color: rgba($color-white, 0.5),
+    $hover-color: rgba($color-white, 0.75),
+    $hover-bg: rgba($color-white, 0.05),
+    $active-color: rgba($color-white, 0.9),
+    $active-bg: $color-primary,
+
+    $muted-color: rgba($color-white, 0.3),
+    $active-muted-color: rgba($color-white, 0.5),
+
+    $arrow-color: rgba($color-white, 0.5),
+    $active-arrow-color: rgba($color-white, 0.5),
+
+    $divider-color: rgba($color-white, 0.1),
+    $line-color: rgba($color-white, 0.1)
+  );
+}
+
+// size modifiers
+.menu.menu--mini {
+  display: inline-block;
+  width: $menu-mini-width;
+  background-color: inherit;
+  .menu__heading {
+    display: none;
+  }
+  > .menu__item {
+    background-color: inherit;
+    > .menu__link {
+      text-align: center;
+      justify-content: center;
+      flex-direction: column;
+      height: $menu-mini-width;
+      font-size: 13px;
+      padding: 0 8px;
+      &::after {
+        display: none;
+      }
+      .menu__icon {
+        width: 100%;
+        margin: 0 0 8px 0;
+        i {
+          font-size: $menu-mini-icon-size;
+        }
+      }
+      .menu__label {
+        width: 100%;
+        flex: 0 0 auto;
+      }
+      .menu__after {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        z-index: 15;
+      }
+    }
+    .menu__sub {
+      position: absolute;
+      width: $menu-submenu-width;
+      background-color: inherit;
+      left: 100%;
+      top: 0;
+      padding: 8px 0;
+      margin: 0;
+      border-left: 0;
+      z-index: 15;
+      .menu__item {
+        background-color: inherit;
+      }
+      .menu__link {
+        text-align: left;
+        margin: 0 8px;
+      }
+      .menu__sub {
+        padding: 8px 0;
+        margin: 0;
+      }
+    }
+  }
+}

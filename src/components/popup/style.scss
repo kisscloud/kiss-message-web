@@ -1,0 +1,63 @@
+@import 'variables';
+
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  overflow: hidden;
+  z-index: $popup-zIndex;
+  pointer-events: none;
+  > span {
+    pointer-events: auto;
+    max-width: 100%;
+  }
+
+  &.is-top {
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  &.is-top-right {
+    align-items: flex-start;
+    justify-content: flex-end;
+  }
+
+  &.is-top-left {
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  &.is-left {
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  &.is-right {
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  &.is-bottom {
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  &.is-bottom-left {
+    align-items: flex-end;
+    justify-content: flex-start;
+  }
+
+  &.is-bottom-right {
+    align-items: flex-end;
+    justify-content: flex-end;
+  }
+
+  &.is-center {
+    > span {
+      margin: auto;
+    }
+  }
+}

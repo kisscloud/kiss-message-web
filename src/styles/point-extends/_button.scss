@@ -1,0 +1,17 @@
+.btn.btn--ghost {
+  background-color: #f5f5f5;
+  background-image: linear-gradient(to bottom,#f9f9f9,#f5f5f5);
+  border: 1px solid $border-color;
+  color: $text-color;
+  text-shadow: 0 1px 0 #fff;
+  &:hover {
+    background-color: #f1f1f1;
+    background-image: linear-gradient(to bottom,#f5f5f5,#f1f1f1);
+    border-color: #e1e1e1;
+  }
+  &:active {
+    background-color: #f2f2f2;
+    background-image: linear-gradient(to bottom,#f0f0f0,#f2f2f2);
+    border-color: darken($border-color, 5%);
+  }
+}

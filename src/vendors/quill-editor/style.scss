@@ -1,0 +1,14 @@
+@import 'variables';
+
+$inactive-color: #888;
+$active-color: #333;
+$toolbar-bg: #F7F8FA;
+$border-color: #ddd;
+$shadow-color: #e4e4e3;
+$color-white: #fff;
+$text-color: #333333;
+$border-radius-base: 3px;
+
+@import './scss/core';
+@import './scss/base';
+@import './scss/snow';

@@ -1,0 +1,61 @@
+/*
+Markup:
+<div class="count {modifiers}">
+  <div class="count__label">...</div>
+  <div class="count__content">...</div>
+</div>
+*/
+
+
+.count {
+
+}
+  .count__label {
+    color: $muted-color;
+  }
+
+  .count__content {
+    line-height: 1.2;
+    font-size: 32px;
+    color: $heading-color;
+  }
+
+// modifers
+.count.count--sm {
+  .count__label {
+    font-size: $font-size-sm;
+  }
+  .count__content {
+    font-size: 20px;
+  }
+}
+
+.count.count--lg {
+  .count__label {
+    font-size: $font-size-lg;
+  }
+  .count__content {
+    font-size: 48px;
+  }
+}
+
+.count.count--xl {
+  .count__label {
+    font-size: 20px;
+    font-weight: normal;
+  }
+  .count__content {
+    font-size: 144px;
+    font-weight: lighter;
+  }
+
+  @include media-breakpoint-down('md') {
+    .count__label {
+      font-size: $font-size-lg;
+    }
+    .count__content {
+      font-size: 48px;
+      font-weight: normal;
+    }
+  }
+}

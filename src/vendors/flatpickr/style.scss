@@ -1,0 +1,674 @@
+@import 'variables';
+
+$day-hover-bg: $grey-lightest;
+$today-badge-bg: $color-primary;
+$selected-day-color: $color-white;
+$selected-day-bg: $color-primary;
+$disabled-day-color: rgba(57,57,57,0.3);
+$weekdays-color: $grey-light;
+$bezier: cubic-bezier(0.23, 1, 0.32, 1);
+$slideTime: 400ms;
+
+.flatpickr-calendar {
+  position: absolute;
+  width: 250px;
+  text-align: center;
+  color: $text-color;
+  font-size: 12px;
+  line-height: 24px;
+  opacity: 0;
+  visibility: hidden;
+  overflow: hidden;
+  touch-action: manipulation;
+  @include dropbox;
+  &.open,
+  &.inline {
+    opacity: 1;
+    visibility: visible;
+    overflow: visible;
+  }
+
+  &.open {
+    display: inline-block;
+    z-index: 1000;
+  }
+
+  &.inline {
+    position: relative;
+    display: block;
+    top: 2px;
+  }
+
+  &.static {
+    position: absolute;
+    top: calc(100% + 2px);
+    &.open {
+      z-index: 999;
+      display: block;
+    }
+  }
+
+  &.hasWeeks {
+    width: auto;
+  }
+
+  &.showTimeInput.hasTime {
+    .flatpickr-time {
+      height: 40px;
+      border-top: 1px solid $border-color;
+    }
+    &.noCalendar {
+      .flatpickr-time {
+        border-top: 0;
+      }
+    }
+  }
+
+  &.noCalendar.hasTime {
+    .flatpickr-time {
+      height: auto;
+    }
+  }
+}
+
+.flatpickr-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.flatpickr-month {
+  border-radius: $dropdown-content-border-radius $dropdown-content-border-radius 0 0;
+  color: $text-color;
+  filter: $text-color;
+  height: 36px;
+  padding: 8px;
+  line-height: 20px;
+  text-align: center;
+  position: relative;
+  user-select: none;
+  border-bottom: 1px solid $border-color;
+  overflow: hidden;
+}
+
+.flatpickr-prev-month,
+.flatpickr-next-month {
+  line-height: 16px;
+  height: 36px;
+  cursor: pointer;
+  text-decoration: none;
+  position: absolute;
+  padding: 10px calc(3.57% - 1.5px);
+  top: 0;
+  z-index: 3;
+
+  i {
+    position: relative;
+  }
+
+  &.flatpickr-prev-month {
+    left: 0;
+  }
+
+  &.flatpickr-next-month {
+    right: 0;
+  }
+
+  &:hover {
+    color: $link-color;
+    svg {
+      fill: $link-color;
+    }
+  }
+
+  svg {
+    width: 14px;
+    path {
+      transition: fill 0.1s;
+      fill: inherit;
+    }
+  }
+}
+
+.numInputWrapper {
+  position: relative;
+  height: auto;
+  &:hover {
+    span {
+      opacity: 1;
+    }
+  }
+
+  input, span {
+    display: inline-block;
+  }
+
+  input {
+    width: 100%;
+  }
+
+  span {
+    position: absolute;
+    right: 0;
+    width: 14px;
+    height: 50%;
+    line-height: 50%;
+    opacity: 0;
+    cursor: pointer;
+    border: 1px solid $divider-color;
+    &:hover {
+      background-color: $grey-lightest;
+    }
+    &:active {
+      background-color: $grey-lighter;
+    }
+
+    &:after {
+      display: block;
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-left: -4px;
+      margin-top: -2px;
+    }
+    &.arrowUp {
+      top: 0;
+      border-bottom: 0;
+      &:after {
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        border-bottom: 4px solid $grey-base;
+      }
+    }
+    &.arrowDown {
+      top: 50%;
+      &:after {
+        margin-top: -1px;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        border-top: 4px solid $grey-base;
+      }
+    }
+    svg {
+      width: inherit;
+      height: auto;
+      path {
+        fill: $text-color;
+      }
+    }
+  }
+}
+
+.flatpickr-current-month {
+  display: inline-block;
+  position: absolute;
+  left: 12.5%;
+  width: 75%;
+  font-size: 135%;
+  line-height: 1;
+  font-weight: 300;
+  color: inherit;
+  text-align: center;
+  transform: translate3d(0px, 0px, 0px);
+
+  &.slideLeft {
+    transform: translate3d(-100%, 0px, 0px);
+    animation: fpFadeOut $slideTime ease, fpSlideLeft $slideTime $bezier;
+  }
+
+  &.slideLeftNew {
+    transform: translate3d(100%, 0px, 0px);
+    animation: fpFadeIn $slideTime ease, fpSlideLeftNew $slideTime $bezier;
+  }
+
+  &.slideRight {
+    transform: translate3d(100%, 0px, 0px);
+    animation: fpFadeOut $slideTime ease, fpSlideRight $slideTime $bezier;
+  }
+
+  &.slideRightNew {
+    transform: translate3d(0, 0, 0px);
+    animation: fpFadeIn $slideTime ease, fpSlideRightNew $slideTime $bezier;
+  }
+
+  span.cur-month {
+    font-weight: 600;
+    display: inline-block;
+    margin-left: 6px;
+    &:hover {
+      background-color: $day-hover-bg;
+    }
+  }
+
+  .numInputWrapper {
+    width: 6ch;
+    display: inline-block;
+    span.arrowUp {
+      right: -5px;
+    }
+    span.arrowDown {
+      right: -5px;
+    }
+  }
+
+  input.cur-year {
+    display: inline;
+    font-size: inherit;
+    font-family: inherit;
+    font-weight: 300;
+    line-height: 1;
+    height: initial;
+    border: 0;
+    border-radius: 0;
+    margin: 0;
+    padding: 0 0 0 0.5ch;
+    background: transparent;
+    vertical-align: initial;
+    &:focus {
+      outline: 0;
+    }
+    &[disabled], &[disabled]:hover {
+      font-size: 100%;
+      color: $disabled-day-color;
+      background: transparent;
+      pointer-events: none;
+    }
+  }
+}
+
+.flatpickr-weekdays {
+  width: 232px;
+  flex-basis: 232px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  overflow: hidden;
+}
+
+.flatpickr-weekdaycontainer {
+  display: flex;
+  flex: 1;
+}
+
+.flatpickr-weekday {
+  display: block;
+  flex: 1 1 0%;
+  color: $weekdays-color;
+  text-align: center;
+  word-wrap: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.flatpickr-days {
+  position: relative;
+  display: flex;
+  overflow: hidden;
+}
+
+.dayContainer {
+  width: 232px;
+  flex-basis: 232px;
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  transform: translate3d(0px, 0px, 0px);
+  opacity: 1;
+}
+
+.flatpickr-calendar.animate .dayContainer {
+  &.slideLeft {
+    animation: fpFadeOut $slideTime $bezier, fpSlideLeft $slideTime $bezier;
+  }
+
+  &.slideLeft, &.slideLeftNew {
+    transform: translate3d(-100%, 0px, 0px);
+  }
+
+  &.slideLeftNew {
+    animation: fpFadeIn $slideTime $bezier, fpSlideLeft $slideTime $bezier;
+  }
+
+  &.slideRight {
+    animation: fpFadeOut $slideTime $bezier, fpSlideRight $slideTime $bezier;
+    transform: translate3d(100%, 0px, 0px);
+  }
+
+  &.slideRightNew {
+    animation: fpFadeIn $slideTime $bezier, fpSlideRightNew $slideTime $bezier;
+  }
+}
+
+.flatpickr-day {
+  position: relative;
+  display: inline-block;
+  width: 14.2857143%;
+  flex: 0 0 14.2857143%;
+  line-height: 28px;
+  height: 28px;
+  margin: 0;
+  font-weight: 400;
+  font-style: normal;
+  text-align: center;
+  cursor: pointer;
+  border-radius: $border-radius-base;
+  transition: all .1s ease-in-out;
+
+  &,
+  &.prevMonthDay, &.nextMonthDay {
+    &.inRange, &.today.inRange,
+    &:hover, &:focus {
+      background-color: $day-hover-bg;
+    }
+  }
+
+  &.today {
+    &:before {
+      content: ' ';
+      display: block;
+      width: 6px;
+      height: 6px;
+      border-radius: 3px;
+      background-color: $today-badge-bg;
+      position: absolute;
+      right: 1px;
+      top: 1px;
+      z-index: 15;
+    }
+  }
+
+  &.selected,
+  &.startRange, &.endRange {
+    &, &:focus, &:hover,
+    &.prevMonthDay, &.nextMonthDay {
+      background-color: $selected-day-bg;
+      color: $selected-day-color;
+    }
+    &.startRange {
+      border-radius: $border-radius-base 0 0 $border-radius-base;
+    }
+    &.endRange {
+      border-radius: 0 $border-radius-base $border-radius-base 0;
+    }
+    &.startRange.endRange {
+      border-radius: $border-radius-base;
+    }
+  }
+
+  &.inRange {
+    border-radius: 0;
+    background-color: $day-hover-bg;
+  }
+
+  &.disabled,
+  &.disabled:hover {
+    pointer-events: none;
+  }
+
+  &.disabled, &.disabled:hover,
+  &.prevMonthDay, &.nextMonthDay,
+  &.notAllowed, &.notAllowed.prevMonthDay, &.notAllowed.nextMonthDay {
+    color: $disabled-day-color;
+    background-color: transparent;
+    cursor: default;
+  }
+}
+
+.rangeMode .flatpickr-day {
+  margin-top: 1px;
+}
+
+.flatpickr-weekwrapper {
+  display: inline-block;
+  float: left;
+  padding: 0 8px;
+  .flatpickr-weekday {
+    float: none;
+    width: 18px;
+  }
+  .flatpickr-weeks {
+    padding: 0;
+  }
+  span.flatpickr-day {
+    display: block;
+    width: 18px;
+    max-width: none;
+  }
+}
+
+.flatpickr-innerContainer {
+  display: flex;
+  overflow: hidden;
+  padding: 8px;
+}
+
+.flatpickr-rContainer {
+  display: inline-block;
+}
+
+.flatpickr-time {
+  display: flex;
+  align-items: stretch;
+  outline: 0;
+  height: 0;
+  text-align: center;
+  line-height: 34px;
+  max-height: 34px;
+  overflow: hidden;
+  transition: height 0.3s cubic-bezier(0, 1, 0.5, 1);
+  border-radius: 0 0 $border-radius-base $border-radius-base;
+
+  .numInputWrapper {
+    flex: 1 1 40%;
+    width: 40%;
+  }
+
+  &.hasSeconds .numInputWrapper {
+    width: 26%;
+  }
+  &.time24hr .numInputWrapper {
+    width: 49%;
+  }
+
+  input {
+    background: transparent;
+    box-sizing: none;
+    border: 0;
+    border-radius: 0;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    line-height: inherit;
+    cursor: pointer;
+    position: relative;
+
+    &.flatpickr-hour {
+      font-weight: bold;
+    }
+    &.flatpickr-minute,
+    &.flatpickr-second {
+      font-weight: 400;
+    }
+    &:focus {
+      outline: 0;
+      border: 0;
+    }
+  }
+
+  .flatpickr-time-separator,
+  .flatpickr-am-pm {
+    display: inline-block;
+    float: left;
+    line-height: inherit;
+    font-weight: bold;
+    width: 2%;
+    user-select: none;
+  }
+
+  .flatpickr-am-pm {
+    outline: 0;
+    width: 18%;
+    cursor: pointer;
+    text-align: center;
+    font-weight: 400;
+    &:hover, &:focus {
+      background-color: $day-hover-bg;
+    }
+  }
+}
+
+.hasWeeks,
+.hasTime {
+  .flatpickr-days {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}
+
+.flatpickr-input {
+  cursor: pointer;
+  &[readonly]:not([disabled]) {
+    box-shadow: inset 0 1px 2px 0 rgba($color-black, 0.08);
+    background-color: $form-input-bg;
+  }
+}
+
+@-webkit-keyframes fpFadeInDown {
+  from {
+    opacity: 0;
+    -webkit-transform: translate3d(0, -20px, 0);
+            transform: translate3d(0, -20px, 0);
+  }
+  to {
+    opacity: 1;
+    -webkit-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes fpFadeInDown {
+  from {
+    opacity: 0;
+    -webkit-transform: translate3d(0, -20px, 0);
+            transform: translate3d(0, -20px, 0);
+  }
+  to {
+    opacity: 1;
+    -webkit-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0);
+  }
+}
+@-webkit-keyframes fpSlideLeft {
+  from {
+    -webkit-transform: translate3d(0px, 0px, 0px);
+            transform: translate3d(0px, 0px, 0px);
+  }
+  to {
+    -webkit-transform: translate3d(-100%, 0px, 0px);
+            transform: translate3d(-100%, 0px, 0px);
+  }
+}
+@keyframes fpSlideLeft {
+  from {
+    -webkit-transform: translate3d(0px, 0px, 0px);
+            transform: translate3d(0px, 0px, 0px);
+  }
+  to {
+    -webkit-transform: translate3d(-100%, 0px, 0px);
+            transform: translate3d(-100%, 0px, 0px);
+  }
+}
+@-webkit-keyframes fpSlideLeftNew {
+  from {
+    -webkit-transform: translate3d(100%, 0px, 0px);
+            transform: translate3d(100%, 0px, 0px);
+  }
+  to {
+    -webkit-transform: translate3d(0px, 0px, 0px);
+            transform: translate3d(0px, 0px, 0px);
+  }
+}
+@keyframes fpSlideLeftNew {
+  from {
+    -webkit-transform: translate3d(100%, 0px, 0px);
+            transform: translate3d(100%, 0px, 0px);
+  }
+  to {
+    -webkit-transform: translate3d(0px, 0px, 0px);
+            transform: translate3d(0px, 0px, 0px);
+  }
+}
+@-webkit-keyframes fpSlideRight {
+  from {
+    -webkit-transform: translate3d(0, 0, 0px);
+            transform: translate3d(0, 0, 0px);
+  }
+  to {
+    -webkit-transform: translate3d(100%, 0px, 0px);
+            transform: translate3d(100%, 0px, 0px);
+  }
+}
+@keyframes fpSlideRight {
+  from {
+    -webkit-transform: translate3d(0, 0, 0px);
+            transform: translate3d(0, 0, 0px);
+  }
+  to {
+    -webkit-transform: translate3d(100%, 0px, 0px);
+            transform: translate3d(100%, 0px, 0px);
+  }
+}
+@-webkit-keyframes fpSlideRightNew {
+  from {
+    -webkit-transform: translate3d(-100%, 0, 0px);
+            transform: translate3d(-100%, 0, 0px);
+  }
+  to {
+    -webkit-transform: translate3d(0, 0, 0px);
+            transform: translate3d(0, 0, 0px);
+  }
+}
+@keyframes fpSlideRightNew {
+  from {
+    -webkit-transform: translate3d(-100%, 0, 0px);
+            transform: translate3d(-100%, 0, 0px);
+  }
+  to {
+    -webkit-transform: translate3d(0, 0, 0px);
+            transform: translate3d(0, 0, 0px);
+  }
+}
+@-webkit-keyframes fpFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes fpFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@-webkit-keyframes fpFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes fpFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

@@ -1,0 +1,34 @@
+.sign {
+  position: relative;
+  max-width: $sign-width;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.sign__header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+  .sign__title {
+    margin: 0 0 8px 0;
+    font-weight: normal;
+    text-align: center;
+    font-size: 36px;
+    line-height: 1.2;
+  }
+  .sign__text {
+    color: $muted-color;
+    text-align: center;
+  }
+
+.sign__body {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  padding: 16px;
+  background-color: $sign-bg;
+}
+
+.sign__footer {
+  margin-top: 16px;
+}

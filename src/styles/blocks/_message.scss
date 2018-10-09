@@ -1,0 +1,25 @@
+.message {
+  position: relative;
+  text-align: center;
+  padding-top: 48px;
+  margin-bottom: 32px;
+}
+
+.message__media {
+  margin-bottom: 16px;
+}
+
+.message__title {
+  color: $heading-color;
+  font-size: 36px;
+  line-height: 1.2;
+  font-weight: 400;
+  padding: 0;
+  margin: 0 0 16px 0;
+}
+
+.message__content {
+  color: $grey-base;
+  font-size: 16px;
+  margin-bottom: 16px;
+}

@@ -1,0 +1,5 @@
+src/vendors
+node_modules
+docs
+lib
+static

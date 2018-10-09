@@ -1,0 +1,108 @@
+@import 'variables';
+
+// Layouts
+.app {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: stretch;
+}
+
+  .app__sider {
+    flex-shrink: 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: $sider-width;
+    color: $sider-color;
+    background-color: $sider-bg;
+  }
+    .app__sider__start {
+      flex: 0 0 auto;
+    }
+      .app__brand {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 50px;
+      }
+    .app__sider__content {
+      flex: 1 1 0%;
+      padding: 8px;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      -ms-overflow-style: none;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+    .app__sider__end {
+      flex: 0 0 auto;
+    }
+
+  .app__content {
+    position: relative;
+    flex: 1 1 0%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+    .app__header {
+      flex-shrink: 0;
+      height: 50px;
+      background-color: $color-primary;
+    }
+
+    .app__body {
+      flex: 1 1 0%;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      -ms-overflow-style: -ms-autohiding-scrollbar;
+    }
+
+      .app__main {
+        padding: 16px;
+      }
+
+    .app__footer {
+      flex-shrink: 0;
+    }
+
+// modifiers
+.app.has-mini-sider .app__sider {
+  width: $sider-mini-width;
+  .app__sider__content {
+    padding: 8px;
+    overflow: visible;
+  }
+}
+
+@include media-breakpoint-down(md) {
+  .app {
+    will-change: transform;
+    transition: transform 250ms ease;
+    .app__sider {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      left: - $sider-width;
+    }
+    &.is-sider-open {
+      transform: translate3d($sider-width, 0, 0);
+    }
+
+    &.has-mini-sider {
+      .app__sider {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        left: - $sider-mini-width;
+      }
+      &.is-sider-open {
+        transform: translate3d($sider-mini-width, 0, 0);
+      }
+    }
+  }
+}

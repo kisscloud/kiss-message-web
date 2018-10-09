@@ -1,0 +1,64 @@
+@import 'variables';
+
+.tooltip {
+  max-width: 320px;
+  z-index: 500;
+
+  &__inner {
+    min-height: 34px;
+    padding: 8px 12px;
+    border-radius: 3px;
+    font-size: 13px;
+    line-height: 18px;
+    color: $color-white;
+    background-color: $color-black;
+  }
+
+  &__arrow {
+    content: '';
+    width: 0;
+    height: 0;
+    border-style: solid;
+    position: absolute;
+  }
+
+  &[x-placement^="top"] {
+    margin-bottom: 5px;
+    .tooltip__arrow {
+      margin: 0 8px;
+      bottom: -5px;
+      border-width: 5px 5px 0 5px;
+      border-color: $color-black transparent transparent transparent;
+    }
+  }
+
+  &[x-placement^="bottom"] {
+    margin-top: 5px;
+    .tooltip__arrow {
+      margin: 0 8px;
+      top: -5px;
+      border-width: 0 5px 5px 5px;
+      border-color: transparent transparent $color-black transparent;
+    }
+  }
+
+  &[x-placement^="left"] {
+    margin-right: 5px;
+    .tooltip__arrow {
+      margin: 8px 0;
+      right: -5px;
+      border-width: 5px 0 5px 5px;
+      border-color: transparent transparent transparent $color-black;
+    }
+  }
+
+  &[x-placement^="right"] {
+    margin-left: 5px;
+    .tooltip__arrow {
+      margin: 8px 0;
+      left: -5px;
+      border-width: 5px 5px 5px 0;
+      border-color: transparent $color-black transparent transparent;
+    }
+  }
+}

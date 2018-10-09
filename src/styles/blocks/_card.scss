@@ -1,0 +1,70 @@
+.card {
+  position: relative;
+  padding: $card-padding;
+  background-color: $card-bg;
+  margin-bottom: $card-margin-bottom;
+
+  > *:first-child {
+    margin-top: 0;
+  }
+
+  > *:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+
+.card__leading {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+.card__title {
+  line-height: 1.2;
+  margin: 0 0 4px 0;
+  .card__leading & {
+    margin: 0;
+    @include oneline;
+  }
+}
+
+.card__control {
+  margin-left: 4px;
+}
+
+.card__media {
+  margin-bottom: 6px;
+  img {
+    width: 100%;
+    height: auto;
+  }
+}
+
+.card__content {
+  font-size: 13px;
+  line-height: 16px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  p {
+    margin-bottom: 6px;
+  }
+}
+
+.card__footer {
+  padding-top: 10px;
+  margin-top: 6px;
+  border-top: 1px solid $card-divider-color;
+}
+
+// modifiers
+.card.card--ghost {
+  padding: 0;
+  background-color: transparent;
+}

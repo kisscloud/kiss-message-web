@@ -1,0 +1,64 @@
+@import 'variables';
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  line-height: 16px;
+  height: 24px;
+  border-radius: 2px;
+  max-width: 100%;
+  overflow: hidden;
+  @include tag-variant($tag-color-default, $tag-bg-default);
+
+  span {
+    display: block;
+    padding: 3px 6px;
+    line-height: 16px;
+    height: 22px;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__close {
+    display: block;
+    color: rgba($color-white, 0.75);
+    border-left: 1px solid mix($color-black, $tag-bg-default, $mix-level-2);
+    padding: 3px 8px;
+    line-height: 16px;
+    height: 22px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-style: normal;
+    cursor: pointer;
+    &:after {
+      content: '×'
+    }
+    &:hover {
+      color: $color-white;
+    }
+  }
+}
+
+// modifiers
+@each $modifier, $value in $master-palette {
+  .tag--#{$modifier} {
+    @include tag-variant($color-white, $value)
+  }
+}
+
+.tag.tag--ghost {
+  border: 1px dashed $border-color;
+  background-color: transparent;
+  .tag__close {
+    border-left: 1px dashed $border-color;
+  }
+}
+
+.tag--clickable {
+  cursor: pointer;
+  &:hover {
+    opacity: 0.85;
+  }
+}

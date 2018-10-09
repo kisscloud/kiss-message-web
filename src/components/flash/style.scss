@@ -1,0 +1,35 @@
+@import 'variables';
+
+.flash {
+  position: relative;
+  border-left: 4px solid $color-primary;
+  padding: 8px 32px 8px 8px;
+  margin-bottom: 16px;
+  background-color: $color-white;
+  > *:first-child {
+    margin-top: 0;
+  }
+  > *:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.flash__close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+@each $modifier, $value in $master-palette {
+  .flash--#{$modifier} {
+    color: $color-white;
+    background-color: $value;
+    border-left-color: mix($color-black, $value, $mix-level-2);
+    .flash__close {
+      color: $color-white;
+    }
+  }
+}

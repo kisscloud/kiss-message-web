@@ -1,0 +1,67 @@
+@import 'variables';
+
+.slider {
+  position: relative;
+  width: 100%;
+  height: 4px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  background-color: $slider-bg;
+
+  &.is-disabled {
+    .slider__bar {
+      opacity: 0.35;
+    }
+    .slider__handle span {
+      cursor: not-allowed;
+    }
+  }
+
+  &__bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 4px;
+    background-color: $color-success;
+    z-index: 5;
+  }
+
+  &__dot {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 4px;
+    width: 3px;
+    background-color: $slider-dot-bg;
+    z-index: 10;
+  }
+
+  &__handle {
+    position: absolute;
+    top: -7px;
+    left: 0;
+    margin-left: -9px;
+    z-index: 15;
+    &::after {
+      font-size: 12px;
+      line-height: 16px;
+      padding: 4px 10px;
+    }
+    &.is-higher {
+      z-index: 20;
+    }
+    &.is-active span {
+      transform: scale(1.3);
+    }
+    span {
+      display: block;
+      cursor: pointer;
+      width: 18px;
+      height: 18px;
+      background-color: $slider-handle-bg;
+      border-radius: 50%;
+      border: 1px solid $slider-handle-border-color;
+      transition: transform, border-color 0.2s ease;
+    }
+  }
+}

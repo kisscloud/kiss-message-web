@@ -1,0 +1,157 @@
+$master-palette: (
+  primary: #7872ff,
+  info: #2196f3,
+  success: #4caf50,
+  danger: #f44336,
+  warning: #ff9800
+) !default;
+
+$color-primary:                    map-get($master-palette, 'primary') !default;
+$color-black:                      #000 !default;
+$color-white:                      #fff !default;
+
+$grey-darkest:                     #161616 !default;
+$grey-dark:                        #333333 !default;
+$grey-base:                        #4D4C4C !default;
+$grey-light:                       #888888 !default;
+$grey-lighter:                     #e4e4e3 !default;
+$grey-lightest:                    #f2f2f2 !default;
+
+$text-color:                       $grey-dark !default;
+$border-color:                     #ddd !default;
+$body-bg:                          #EEEEEE !default;
+
+$grid-columns:                     24 !default;
+$grid-gutter-width-base:           16px !default;
+
+$grid-breakpoints: (
+  xs: 0, // phone
+  sm: 600px, // portrait tablet
+  md: 900px, // landscape tablet or vertical desktop
+  lg: 1200px, // desktop
+  xl: 1600px // desktop HD
+) !default;
+
+$container-max-widths: (
+  xs: 100%,
+  sm: 100%,
+  md: 960px,
+  lg: 1152px,
+  xl: 1344px
+) !default;
+
+$grid-gutter-widths: (
+  xs: $grid-gutter-width-base,
+  sm: $grid-gutter-width-base,
+  md: $grid-gutter-width-base,
+  lg: $grid-gutter-width-base,
+  xl: $grid-gutter-width-base
+) !default;
+
+$table-hover-color:                      mix($color-white, $color-primary, 95%) !default;
+$navbar-item-margin-x:                   32px !default;
+// z-index
+// -----------------------------------------------------------------------------
+$zIndex-1: 100;
+$zIndex-2: 200;
+$zIndex-3: 300;
+$zIndex-4: 400;
+$zIndex-5: 500;
+$zIndex-6: 600;
+$zIndex-7: 700;
+$zIndex-8: 800;
+$zIndex-9: 900;
+$zIndex-10: 1000;
+
+$dropdown-zIndex:                        $zIndex-1 !default;
+$mask-zIndex:                            $zIndex-3 !default;
+$popup-zIndex:                           $zIndex-5 !default;
+$modal-zIndex:                           $zIndex-7 !default;
+$toast-zIndex:                           $zIndex-9 !default;
+
+// point variables
+// -----------------------------------------------------------------------------
+@import 'settings/colors';
+@import 'point/scss/variables';
+@import 'point/scss/mixins';
+@import 'mixins/index';
+
+
+// Layouts
+// -----------------------------------------------------------------------------
+$sider-bg:                            #17141D !default; // #25292B !default;
+$sider-color:                         #898395 !default; // #969696 !default;
+$sider-width:                           200px !default;
+$sider-mini-width:                      86px !default;
+
+// Menu
+// -----------------------------------------------------------------------------
+$menu-heading-color:                    $grey-base !default;
+$menu-color:                            $grey-dark !default;
+$menu-hover-color:                      $menu-color !default;
+$menu-hover-bg:                         $grey-lightest !default;
+$menu-active-color:                     $color-white !default;
+$menu-active-bg:                        $color-primary !default;
+$menu-muted-color:                      $grey-light !default;
+$menu-active-muted-color:               rgba($menu-active-color, 0.65) !default;
+$menu-arrow-color:                      rgba($menu-color, 0.75) !default;
+$menu-active-arrow-color:               $menu-arrow-color !default;
+$menu-divider-bg:                       rgba($menu-color, 0.15) !default;
+$menu-line-color:                       rgba($menu-color, 0.15) !default;
+$menu-submenu-width:                    150px !default;
+$menu-mini-width:                       70px !default;
+$menu-mini-icon-size:                   20px !default;
+
+// Tag
+// -----------------------------------------------------------------------------
+$tag-color-default:                     $text-color !default;
+$tag-bg-default:                        $grey-lightest !default;
+$tag-padding-y-base:                    8px !default;
+$tag-padding-x-base:                    16px !default;
+
+// Toolbar
+// -----------------------------------------------------------------------------
+$toolbar-bg:                            $color-white !default;
+$toolbar-padding:                       16px !default;
+$toolbar-margin-bottom:                 16px !default;
+
+// Dropdown
+// -----------------------------------------------------------------------------
+$dropdown-content-bg-color:             $color-white !default;
+$dropdown-content-border-color:         $border-color !default;
+$dropdown-content-border-width:         $border-width !default;
+$dropdown-content-border-radius:        $border-radius-base !default;
+$dropdown-content-min-width:            160px !default;
+
+// Slider
+// -----------------------------------------------------------------------------
+$slider-bg:                             $grey-lighter !default;
+$slider-dot-bg:                         rgba($color-black, 0.15) !default;
+$slider-handle-bg:                      $color-white !default;
+$slider-handle-border-color:            #dbdbdb !default;
+
+// Sign
+// -----------------------------------------------------------------------------
+$sign-width:                            360px !default;
+$sign-bg:                               $color-white !default;
+
+// Card
+// -----------------------------------------------------------------------------
+$card-padding:                          10px !default;
+$card-bg:                               $color-white !default;
+$card-margin-bottom:                    16px !default;
+$card-over-bg:                          rgba($color-white, 0.9) !default;
+$card-divider-color:                    $divider-color !default;
+
+// Notification
+// -----------------------------------------------------------------------------
+$notification-width:                    280px !default;
+$notification-border-radius:            2px !default;
+$notification-padding:                  10px !default;
+$notification-margin-bottom:            10px !default;
+$notification-bg:                       $color-white !default;
+$notification-box-shadow:               0 0 2px rgba($color-black,0.2) !default;
+$notification-title-size:               $font-size-lg !default;
+$notification-title-color:              $heading-color !default;
+$notification-text-color:               $muted-color !default;
+$notification-text-size:                $font-size-sm !default;

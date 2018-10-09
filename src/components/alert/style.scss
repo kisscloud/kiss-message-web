@@ -1,0 +1,26 @@
+@import 'variables';
+
+.modal.modal--alert {
+  .modal__title {
+    display: flex;
+    align-items: center;
+    svg {
+      fill: $color-primary;
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+    }
+  }
+  &.is-info .modal__title svg {
+    fill: map-get($master-palette, 'info');
+  }
+  &.is-error .modal__title svg {
+    fill: map-get($master-palette, 'danger');
+  }
+  &.is-warning .modal__title svg {
+    fill: map-get($master-palette, 'warning');
+  }
+  &.is-success .modal__title svg {
+    fill: map-get($master-palette, 'success');
+  }
+}

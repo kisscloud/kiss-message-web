@@ -1,0 +1,147 @@
+// Inline
+.nav.nav--inline {
+  display: flex;
+  align-items: center;
+  > .nav__item {
+    &:not(:last-child) {
+      margin-right: 8px;
+    }
+    > .nav__link {
+      color: inherit;
+      padding: 0;
+      line-height: 1.2;
+    }
+  }
+}
+
+// Gap, Dot
+.nav.nav--gap,
+.nav.nav--dot {
+  display: flex;
+  > .nav__item {
+    position: relative;
+    &:not(:last-child) {
+      padding-right: 12px;
+      margin-right: 12px;
+    }
+
+    > .nav__link {
+      color: $text-color;
+      padding-left: 0;
+      padding-right: 0;
+      &:hover {
+        color: $link-color;
+      }
+      &.is-active {
+        color: $color-primary;
+      }
+    }
+  }
+}
+
+.nav.nav--gap {
+  > .nav__item:not(:last-child):after {
+    content: '';
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 31%;
+    width: 1px;
+    height: 38%;
+    background-color: $divider-color;
+  }
+}
+
+.nav.nav--dot {
+  > .nav__item:not(:last-child):after {
+    content: ' ';
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    margin-top: -1px;
+    width: 2px;
+    height: 2px;
+    border-radius: 1px;
+    background-color: $muted-color;
+  }
+}
+
+// Underline
+.nav.nav--underline {
+  display: flex;
+  border-bottom: 1px solid $border-color;
+  > .nav__item {
+    position: relative;
+    margin-bottom: -1px;
+    z-index: 15;
+    > .nav__link {
+      color: $text-color;
+      padding: 0 12px 6px 12px;
+      border-bottom: 2px solid transparent;
+      &:hover {
+        color: $color-primary;
+      }
+      &.is-active {
+        color: $color-primary;
+        border-bottom-color: $color-primary;
+      }
+    }
+  }
+}
+
+// Line
+.nav.nav--line-start,
+.nav.nav--line-end,
+.nav.nav--line-around {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+}
+
+.nav.nav--line-start {
+  &:before {
+    content: " ";
+    display: block;
+    height: 1px;
+    flex: 1 1 0%;
+    min-width: 0;
+    margin-right: 8px;
+    background-color: $divider-color;
+  }
+}
+
+.nav.nav--line-end {
+  &:after {
+    content: " ";
+    display: block;
+    height: 1px;
+    flex: 1 1 0%;
+    min-width: 0;
+    margin-left: 8px;
+    background-color: $divider-color;
+  }
+}
+
+.nav.nav--line-around {
+  justify-content: center;
+  &:before {
+    content: " ";
+    display: block;
+    height: 1px;
+    flex: 1 1 0%;
+    min-width: 0;
+    margin-right: 8px;
+    background-color: $divider-color;
+  }
+  &:after {
+    content: " ";
+    display: block;
+    height: 1px;
+    flex: 1 1 0%;
+    min-width: 0;
+    margin-left: 8px;
+    background-color: $divider-color;
+  }
+}

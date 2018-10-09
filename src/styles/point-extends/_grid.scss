@@ -1,0 +1,10 @@
+.l-row.is-card {
+  align-items: stretch;
+  > [class*="l-col"] {
+    display: flex;
+    flex-direction: column;
+    > * {
+      flex: 1 0 auto;
+    }
+  }
+}

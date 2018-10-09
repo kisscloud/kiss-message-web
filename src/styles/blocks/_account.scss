@@ -1,0 +1,49 @@
+/*
+Markup:
+<div class="account">
+  <figure class="account__media">
+    <img class="avatar" src="" alt="">
+  </figure>
+  <div class="account__content">
+    <div class="account__title"></div>
+    <div class="account__meta"></div>
+  </div>
+  <div class="account__after">
+    <i class="i-caret i-caret--light"></i>
+  </div>
+</div>
+*/
+
+.account {
+  display: flex;
+  align-items: center;
+  font-size: $font-size-base;
+
+  &__media {
+    margin: 0;
+    + .account__content {
+      margin-left: $space-inline-base;
+    }
+  }
+
+  &__content {
+
+  }
+    &__title {
+      color: $heading-color;
+      font-size: $font-size-base;
+      font-weight: 500;
+      line-height: 1.2;
+      margin: 0;
+      @include oneline;
+    }
+    &__meta {
+      color: $muted-color;
+      font-size: 75%;
+      white-space: nowrap;
+    }
+
+  &__after {
+    margin-left: $space-inline-m;
+  }
+}

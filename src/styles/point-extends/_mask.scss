@@ -1,0 +1,14 @@
+.mask {
+  transition: opacity 150ms;
+  will-change: opacity;
+  transform: translateZ(0);
+  &.is-enter {
+    opacity: 0;
+  }
+  &.is-enter-active {
+    opacity: 1;
+  }
+  &.is-leaving {
+    opacity: 0;
+  }
+}

@@ -1,0 +1,25 @@
+.l-stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.l-stack__start {
+  flex: 0 0 auto;
+}
+
+.l-stack__content {
+  flex: 1 1 0%;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+}
+
+.l-stack__end {
+  flex: 0 0 auto;
+}
+
+.l-stack {
+  &.l-stack--row {
+    flex-direction: row;
+  }
+}
