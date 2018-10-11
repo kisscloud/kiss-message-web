@@ -27,27 +27,12 @@ export const Ping = (data, options) => {
   return ajax.get('/ping', data, options)
 }
 
-// 邮箱登录
-export const AuthEmailLogin = (data, options) => {
-  return ajax.post('/api/auth/email/login', data, options)
-}
+// 登录
+export const AuthLogin = (data, options) => {
+  return ajax.post('/kiss-account/user/login', data, options);
+};
 
-// 邮箱注册
-export const AuthEmailRegister = (data, options) => {
-  return ajax.post('/api/auth/email/register', data, options)
-}
-
-// 下单
-export const PlaceOrder = (data, options) => {
-  return ajax.post('/api/order', data, options)
-}
-
-// 获取交易页面参数
-export const GetPageTradeParams = (data, options) => {
-  return ajax.get('/api/page/trade', data, options)
-}
-
-// 获取账户余额
-export const GetTradeAccountBalances = (data, options) => {
-  return ajax.get('/api/transfer/trade/account/balances', data, options)
-}
+// 获取用户列表
+export const GetAccounts = (data, options) => {
+  return ajax.post('/kiss-account/accounts', data, options);
+};

@@ -3,7 +3,7 @@
     <c-content>
       <section class="sign u-m-auto">
         <div class="sign__body">
-          <h1 class="sign__title u-fs-24">Reset Password</h1>
+          <h1 class="sign__title u-fs-24">重置密码</h1>
           <c-form action="/login" method="GET">
             <c-form-field>
               <c-form-input icon-start="icon-lock" type="password" placeholder="New Password"></c-form-input>

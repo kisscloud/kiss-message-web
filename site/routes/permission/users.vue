@@ -164,6 +164,8 @@
 </template>
 
 <script>
+import * as api from '../../../src/api';
+
 export default {
   name: 'PersmissionUsers',
   data() {
@@ -278,6 +280,10 @@ export default {
         label: 'label'
       }
     };
+  },
+  async mounted() {
+    let res = api.GetAccounts();
+    console.log(res);
   },
   methods: {
     submitUserForm() {
