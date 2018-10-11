@@ -1,34 +1,35 @@
 <template>
   <c-main id="page-users">
-   <header class="toolbar">
+    <header class="toolbar">
       <c-level>
         <template slot="left">
-          <div class="cell">
-            <!-- <div class="cell__media">
-              <i class="icon-footprint"></i>
-            </div> -->
-            <div class="cell__content">
-              <h1 class="toolbar__title">用户管理 <span>管理平台的部门和用户</span></h1>
+            <div class="cell">
+              <!-- <div class="cell__media">
+                <i class="icon-footprint"></i>
+              </div> -->
+              <div class="cell__content">
+                <h1 class="toolbar__title">用户管理 <span>管理平台的部门和用户</span></h1>
+              </div>
             </div>
-          </div>
-        </template>
-        <template slot="right">
-          <c-level-item>
-            <el-input style="width=300px;" size="small" placeholder="输入用户ID/姓名/邮箱/手机号">
-              <el-button slot="append" icon="el-icon-search"></el-button>
-            </el-input>
-          </c-level-item>
-          <el-dropdown @command="handleCommand">
-            <el-button type="primary" size="small">
-              添加
-            </el-button>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item command="account">添加用户</el-dropdown-item>
-              <el-dropdown-item command="group">添加部门</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-          <!-- <c-level-item><c-button icon-start="icon-plus-circle" type="info" smart>添加</c-button></c-level-item> -->
-        </template>
+</template>
+
+<template slot="right">
+  <c-level-item>
+    <el-input style="width=300px;" size="small" placeholder="输入用户ID/姓名/邮箱/手机号">
+      <el-button slot="append" icon="el-icon-search"></el-button>
+    </el-input>
+  </c-level-item>
+  <el-dropdown @command="handleCommand">
+    <el-button type="primary" size="small">
+      添加
+    </el-button>
+    <el-dropdown-menu slot="dropdown">
+      <el-dropdown-item command="account">添加用户</el-dropdown-item>
+      <el-dropdown-item command="group">添加部门</el-dropdown-item>
+    </el-dropdown-menu>
+  </el-dropdown>
+  <!-- <c-level-item><c-button icon-start="icon-plus-circle" type="info" smart>添加</c-button></c-level-item> -->
+</template>
       </c-level>
     </header>
     
@@ -43,7 +44,7 @@
               <!-- <el-button style="float: right; padding: 3px 0" type="text">添加部门</el-button> -->
           </div>
           <el-tree
-          :data="data6"
+          :data="groupTree"
           node-key="id"
           default-expand-all
           @node-drag-start="handleDragStart"
@@ -96,10 +97,11 @@
               fixed="right"
               label="操作"
               width="100">
-              <template slot-scope="scope">
-                <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button>
-                <el-button type="text" size="small">编辑</el-button>
-              </template>
+<template slot-scope="scope">
+  <el-button @click="handleClick(scope.row)" type="text" size="small">
+    查看</el-button>
+  <el-button type="text" size="small">编辑</el-button>
+</template>
             </el-table-column>
           </el-table>
           <br>
@@ -115,10 +117,9 @@
     
     <el-dialog title="添加用户" :visible.sync="showUserFormModal">
       <el-form :model="userForm" :rules="userFormRules" ref="userForm">
-        <el-form-item label="部门" :label-width="formLabelWidth">
+        <el-form-item label="部门" :label-width="formLabelWidth" prop="groupId">
           <el-select v-model="userForm.groupId" placeholder="请选择用户所属部门" style="width:100%;">
-            <el-option label="技术部" value="shanghai"></el-option>
-            <el-option label="运营部" value="beijing"></el-option>
+            <el-option v-for="item in userFormGroups" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="姓名" :label-width="formLabelWidth" prop="name">
@@ -134,7 +135,7 @@
           <el-input v-model="userForm.mobile" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="密码" :label-width="formLabelWidth" prop="password">
-          <el-input v-model="userForm.password" autocomplete="off"></el-input>
+          <el-input type="password" v-model="userForm.password" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -147,8 +148,7 @@
       <el-form :model="groupForm" :rules="groupFormRules" ref="groupForm">
         <el-form-item label="父部门" :label-width="formLabelWidth">
           <el-select v-model="groupForm.parentId" placeholder="请选择父部门" style="width:100%;">
-            <el-option label="区域一" value="shanghai"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
+            <el-option v-for="item in groupFormGroups" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="部门名称" :label-width="formLabelWidth" prop="name">
@@ -165,6 +165,22 @@
 
 <script>
 import * as api from '../../../src/api';
+import * as codes from '../../../src/codes';
+import merge from 'merge';
+
+var userForm = {
+  groupId: null,
+  name: null,
+  username: null,
+  email: null,
+  mobile: null,
+  password: null
+};
+
+var groupForm = {
+  parentId: 0,
+  name: null
+};
 
 export default {
   name: 'PersmissionUsers',
@@ -173,30 +189,61 @@ export default {
       showUserFormModal: false,
       showGroupFormModal: false,
       formLabelWidth: '80px',
-      userForm: {
-        groupId: 1,
-        name: null,
-        username: null,
-        email: null,
-        mobile: null,
-        password: null
-      },
-      groupForm: {},
+      userForm: merge({}, userForm),
+      groupForm: merge({}, groupForm),
       userFormRules: {
-        name: [{ required: true, message: '请输入姓名', trigger: 'change' }],
+        groupId: [
+          {
+            required: true,
+            message: '请选择部门',
+            trigger: 'change'
+          }
+        ],
+        name: [
+          {
+            required: true,
+            message: '请输入姓名',
+            trigger: 'change'
+          }
+        ],
         username: [
-          { required: true, message: '请输入用户名', trigger: 'change' }
+          {
+            required: true,
+            message: '请输入用户名',
+            trigger: 'change'
+          }
         ],
         email: [
-          { required: true, message: '请输入邮箱', trigger: 'change' },
-          { type: 'email', message: '请输入正确的邮箱', trigger: 'change' }
+          {
+            required: true,
+            message: '请输入邮箱',
+            trigger: 'change'
+          },
+          {
+            type: 'email',
+            message: '请输入正确的邮箱',
+            trigger: 'change'
+          }
         ],
         mobile: [
-          { required: true, message: '请输入手机号', trigger: 'change' }
+          {
+            required: true,
+            message: '请输入手机号',
+            trigger: 'change'
+          }
         ],
         password: [
-          { required: true, message: '请输入密码', trigger: 'change' },
-          { min: 8, max: 20, message: '请输入8到20位密码', trigger: 'blur' }
+          {
+            required: true,
+            message: '请输入密码',
+            trigger: 'change'
+          },
+          {
+            min: 8,
+            max: 20,
+            message: '请输入8到20位密码',
+            trigger: 'blur'
+          }
         ]
       },
       groupFormRules: {
@@ -215,39 +262,11 @@ export default {
           email: 'koyeo@qq.com',
           mobile: '1882934343',
           status: '在职'
-        },
-        {
-          name: '王小虎',
-          group: '开发部',
-          email: 'koyeo@qq.com',
-          mobile: '1882934343',
-          status: '在职'
-        },
-        {
-          name: '王小虎',
-          group: '开发部',
-          email: 'koyeo@qq.com',
-          mobile: '1882934343',
-          status: '在职'
-        },
-        {
-          name: '王小虎',
-          group: '开发部',
-          email: 'koyeo@qq.com',
-          mobile: '1882934343',
-          status: '在职'
-        },
-        {
-          name: '王小虎',
-          group: '开发部',
-          email: 'koyeo@qq.com',
-          mobile: '1882934343',
-          status: '在职'
         }
       ],
-      data6: [
+      groupTree: [
         {
-          id: 1,
+          id: 2,
           label: '技术部',
           children: [
             {
@@ -259,37 +278,40 @@ export default {
               label: 'JAVA开发'
             }
           ]
-        },
-        {
-          id: 2,
-          label: '运营',
-          children: [
-            {
-              id: 5,
-              label: '交易所运营'
-            },
-            {
-              id: 6,
-              label: '交易所运营'
-            }
-          ]
         }
       ],
-      defaultProps: {
-        children: 'children',
-        label: 'label'
-      }
+      groupFormGroups: [
+        {
+          id: 0,
+          name: '无'
+        }
+      ],
+      userFormGroups: []
     };
   },
   async mounted() {
     let res = api.GetAccounts();
-    console.log(res);
   },
   methods: {
     submitUserForm() {
-      this.$refs['userForm'].validate(valid => {
+      this.$refs['userForm'].validate(async valid => {
         if (valid) {
-          alert('submit!');
+          this.userForm.groupId = parseInt(this.userForm.groupId);
+          let res = await api.PostAccounts(this.userForm);
+          if (res.code === codes.Success) {
+            this.showUserFormModal = false;
+            this.users.push(res.data);
+            this.$refs['userForm'].resetFields();
+            this.$message({
+              message: '用户添加成功',
+              type: 'success'
+            });
+          } else {
+            this.$message({
+              message: res.message,
+              type: 'warning'
+            });
+          }
         } else {
           console.log('error submit!!');
           return false;
@@ -297,9 +319,25 @@ export default {
       });
     },
     submitGroupForm() {
-      this.$refs['groupForm'].validate(valid => {
+      this.$refs['groupForm'].validate(async valid => {
         if (valid) {
-          alert('submit!');
+          this.groupForm.parentId = parseInt(this.groupForm.parentId);
+          let res = await api.PostAccountsGroups(this.groupForm);
+          if (res.code === codes.Success) {
+            this.showGroupFormModal = false;
+            this.userFormGroups.push(res.data);
+            this.groupFormGroups.push(res.data);
+            this.$refs['groupForm'].resetFields();
+            this.$message({
+              message: '部门添加成功',
+              type: 'success'
+            });
+          } else {
+            this.$message({
+              message: res.message,
+              type: 'warning'
+            });
+          }
         } else {
           console.log('error submit!!');
           return false;

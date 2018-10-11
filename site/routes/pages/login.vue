@@ -68,6 +68,9 @@ export default {
 
       let res = await api.AuthLogin(this.form);
       if (res.code === 0) {
+        localStorage.setItem('accessToken', res.data.accessToken);
+        localStorage.setItem('expiredAt', res.data.expiredAt);
+        this.$router.push({ path: '/' });
       } else {
         this.$message({
           message: res.message,

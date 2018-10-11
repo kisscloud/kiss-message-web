@@ -29,10 +29,45 @@ export const Ping = (data, options) => {
 
 // 登录
 export const AuthLogin = (data, options) => {
-  return ajax.post('/kiss-account/user/login', data, options);
+  return ajax.post('/kiss-account/auth/username/login', data, options);
 };
 
 // 获取用户列表
 export const GetAccounts = (data, options) => {
+  return ajax.get('/kiss-account/accounts', data, options);
+};
+
+// 添加部门
+export const PostAccountsGroups = (data, options) => {
+  return ajax.post('/kiss-account/accounts/groups', data, options);
+};
+
+// 添加用户
+export const PostAccounts = (data, options) => {
   return ajax.post('/kiss-account/accounts', data, options);
+};
+
+// 添加权限
+export const PostPermissions = (data, options) => {
+  return ajax.post('/kiss-account/permissions', data, options);
+};
+
+// 添加权限模块
+export const PostPermissionsModules = (data, options) => {
+  return ajax.post('/kiss-account/permissions/modules', data, options);
+};
+
+// 添加角色
+export const PostRoles = (data, options) => {
+  return ajax.post('/kiss-account/roles', data, options);
+};
+
+// 绑定角色权限
+export const PostRolePermissions = (data, options) => {
+  return ajax.post('/kiss-account/roles/permissions', data, options);
+};
+
+// 绑定角色用户
+export const PostRolesAccounts = (data, options) => {
+  return ajax.post('/kiss-account/accounts/roles', data, options);
 };

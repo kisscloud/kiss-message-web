@@ -1,23 +1,24 @@
 <template>
   <c-main id="page-roles">
-   <header class="toolbar">
+    <header class="toolbar">
       <c-level>
         <template slot="left">
-          <div class="cell">
-            <!-- <div class="cell__media">
-              <i class="icon-footprint"></i>
-            </div> -->
-            <div class="cell__content">
-              <h1 class="toolbar__title">角色管理 <span>平台角色管理</span></h1>
+            <div class="cell">
+              <!-- <div class="cell__media">
+                <i class="icon-footprint"></i>
+              </div> -->
+              <div class="cell__content">
+                <h1 class="toolbar__title">角色管理 <span>平台角色管理</span></h1>
+              </div>
             </div>
-          </div>
-        </template>
-        <template slot="right">
-          <el-button @click="openRoleFormModal()" type="primary" size="small">
-            添加角色
-          </el-button>
-          <!-- <c-level-item><c-button icon-start="icon-plus-circle" type="info" smart>添加</c-button></c-level-item> -->
-        </template>
+</template>
+
+<template slot="right">
+  <el-button @click="openRoleFormModal()" type="primary" size="small">
+    添加角色
+  </el-button>
+  <!-- <c-level-item><c-button icon-start="icon-plus-circle" type="info" smart>添加</c-button></c-level-item> -->
+</template>
       </c-level>
     </header>
     
@@ -44,9 +45,10 @@
               width="60px"
               align="right"
               label="操作">
-              <template slot-scope="scope">
-                <el-button type="text" size="small"><i class="icon-pencil"></i></el-button>
-              </template> 
+<template slot-scope="scope">
+  <el-button type="text" size="small">
+    <i class="icon-pencil"></i></el-button>
+</template>
             </el-table-column>
           </el-table>
           </el-card>
@@ -98,8 +100,8 @@
         </el-form-item>
         <el-form-item label="角色状态" label-width="80px">
           <el-radio-group  v-model="roleForm.status">
-            <el-radio label="生效"></el-radio>
-            <el-radio label="失效"></el-radio>
+            <el-radio label="1">有效</el-radio>
+            <el-radio label="0">无效</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
@@ -112,6 +114,10 @@
 </template>
 
 <script>
+import * as api from '../../../src/api';
+import * as codes from '../../../src/codes';
+import merge from 'merge';
+
 export default {
   name: 'PersmissionUsers',
   data() {
@@ -146,7 +152,7 @@ export default {
       },
       roleForm: {
         name: null,
-        status: 1
+        status: '1'
       },
       roleFormRules: {
         name: [
@@ -206,9 +212,24 @@ export default {
   },
   methods: {
     submitRoleForm() {
-      this.$refs['roleForm'].validate(valid => {
+      this.$refs['roleForm'].validate(async valid => {
         if (valid) {
-          alert('submit!');
+          this.roleForm.status = parseInt(this.roleForm.status);
+          let res = await api.PostRoles(this.roleForm);
+          if (res.code === codes.Success) {
+            this.showRoleFormModal = false;
+            this.roles.push(res.data);
+            this.$refs['roleForm'].resetFields();
+            this.$message({
+              message: '角色添加成功',
+              type: 'success'
+            });
+          } else {
+            this.$message({
+              message: res.message,
+              type: 'warning'
+            });
+          }
         } else {
           console.log('error submit!!');
           return false;

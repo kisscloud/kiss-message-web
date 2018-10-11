@@ -42,7 +42,7 @@
               <!-- <el-button style="float: right; padding: 3px 0" type="text">添加部门</el-button> -->
           </div>
           <el-tree
-          :data="data6"
+          :data="moduleTree"
           node-key="id"
           default-expand-all
           @node-drag-start="handleDragStart"
@@ -67,7 +67,7 @@
           </div>
 
           <el-table
-            :data="users"
+            :data="permissions"
             border
             style="width: 100%">
             <el-table-column
@@ -102,30 +102,29 @@
               </template>
             </el-table-column>
           </el-table>
-          <br>
-          <el-pagination
+          <!-- <br> -->
+          <!-- <el-pagination
             background
             layout="prev, pager, next"
             :total="100">
-          </el-pagination>
-          <br>
+          </el-pagination> -->
+          <!-- <br> -->
         </el-card>
       </el-main>
     </el-container>
 
     <el-dialog title="添加权限" :visible.sync="showPermissionFormModal">
       <el-form :model="permissionForm" :rules="permissionFormRules" ref="permissionForm">
-        <el-form-item label="所属模块" :label-width="formLabelWidth">
+        <el-form-item label="所属模块" :label-width="formLabelWidth" prop="moduleId">
           <el-select v-model="permissionForm.moduleId" placeholder="请选择权限模块" style="width:100%;">
-            <el-option label="区域一" value="shanghai"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
+            <el-option v-for="item in permissionFormModules" v-bind:key="'permissionForm_'+item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="权限名称" :label-width="formLabelWidth" prop="name">
           <el-input v-model="permissionForm.name" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="权限类型" :label-width="formLabelWidth">
-          <el-select placeholder="请选择权限类型" style="width:100%;">
+        <el-form-item label="权限类型" :label-width="formLabelWidth" prop="type">
+          <el-select v-model="permissionForm.type" placeholder="请选择权限类型" style="width:100%;">
             <el-option label="接口" value="1"></el-option>
             <el-option label="菜单" value="2"></el-option>
             <el-option label="按钮" value="3"></el-option>
@@ -136,8 +135,8 @@
         </el-form-item>
         <el-form-item label="权限状态" :label-width="formLabelWidth">
           <el-radio-group v-model="permissionForm.status">
-            <el-radio label="生效"></el-radio>
-            <el-radio label="失效"></el-radio>
+            <el-radio label="1">有效</el-radio>
+            <el-radio label="0">无效</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
@@ -151,17 +150,16 @@
       <el-form :model="moduleForm" :rules="moduleFormRules" ref="moduleForm">
         <el-form-item label="父模块" :label-width="formLabelWidth">
           <el-select v-model="moduleForm.parentId" placeholder="请选择父模块" style="width:100%;">
-            <el-option label="区域一" value="shanghai"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
+            <el-option v-for="item in moduleFormModules" v-bind:key="'moduleForm_'+item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="模块名称" :label-width="formLabelWidth" prop="name">
           <el-input v-model="moduleForm.name" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="模块状态" :label-width="formLabelWidth">
-          <el-radio-group>
-            <el-radio label="生效"></el-radio>
-            <el-radio label="失效"></el-radio>
+          <el-radio-group v-model="moduleForm.status">
+            <el-radio label="1">有效</el-radio>
+            <el-radio label="0">无效</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
@@ -174,6 +172,10 @@
 </template>
 
 <script>
+import * as api from '../../../src/api';
+import * as codes from '../../../src/codes';
+import merge from 'merge';
+
 export default {
   name: 'PersmissionUsers',
   data() {
@@ -183,62 +185,48 @@ export default {
       formLabelWidth: '80px',
       moduleForm: {
         parentId: 0,
-        name: null
+        name: null,
+        status: '1'
       },
       permissionForm: {
-        moduleId: 0,
+        moduleId: null,
         name: null,
-        type: 0,
+        type: '1',
         code: null,
-        status: 1
+        status: '1'
       },
       permissionFormRules: {
+        moduleId: [
+          { required: true, message: '请选择所属模块', trigger: 'change' }
+        ],
         name: [
           { required: true, message: '请输入权限名称', trigger: 'change' }
+        ],
+        type: [
+          { required: true, message: '请选择权限类型', trigger: 'change' }
         ],
         code: [{ required: true, message: '请输入权限码', trigger: 'change' }]
       },
       moduleFormRules: {
         name: [{ required: true, message: '请输入模块名称', trigger: 'change' }]
       },
-      users: [
+      permissions: [
         {
-          name: '王小虎',
-          group: '开发部',
-          email: 'koyeo@qq.com',
-          mobile: '1882934343',
-          status: '在职'
+          name: '审核用户提币',
+          group: '交易所业务端',
+          email: '接口',
+          mobile: 'post@kiss-engine/withdraw/audit',
+          status: '有效'
         },
         {
-          name: '王小虎',
-          group: '开发部',
-          email: 'koyeo@qq.com',
-          mobile: '1882934343',
-          status: '在职'
-        },
-        {
-          name: '王小虎',
-          group: '开发部',
-          email: 'koyeo@qq.com',
-          mobile: '1882934343',
-          status: '在职'
-        },
-        {
-          name: '王小虎',
-          group: '开发部',
-          email: 'koyeo@qq.com',
-          mobile: '1882934343',
-          status: '在职'
-        },
-        {
-          name: '王小虎',
-          group: '开发部',
-          email: 'koyeo@qq.com',
-          mobile: '1882934343',
-          status: '在职'
+          name: '用户KYC审核',
+          group: '交易所业务端',
+          email: '接口',
+          mobile: 'post@kiss-engine/withdraw/audit',
+          status: '有效'
         }
       ],
-      data6: [
+      moduleTree: [
         {
           id: 1,
           label: '技术部',
@@ -268,6 +256,8 @@ export default {
           ]
         }
       ],
+      moduleFormModules: [{ id: 0, name: '无' }],
+      permissionFormModules: [],
       defaultProps: {
         children: 'children',
         label: 'label'
@@ -276,9 +266,25 @@ export default {
   },
   methods: {
     submitPermissionForm() {
-      this.$refs['permissionForm'].validate(valid => {
+      this.$refs['permissionForm'].validate(async valid => {
         if (valid) {
-          alert('submit!');
+          this.permissionForm.moduleId = parseInt(this.permissionForm.moduleId);
+          this.permissionForm.status = parseInt(this.permissionForm.status);
+          let res = await api.PostPermissions(this.permissionForm);
+          if (res.code === codes.Success) {
+            this.showPermissionFormModal = false;
+            this.permissions.push(res.data);
+            this.$refs['permissionForm'].resetFields();
+            this.$message({
+              message: '权限添加成功',
+              type: 'success'
+            });
+          } else {
+            this.$message({
+              message: res.message,
+              type: 'warning'
+            });
+          }
         } else {
           console.log('error submit!!');
           return false;
@@ -286,9 +292,26 @@ export default {
       });
     },
     submitModuleForm() {
-      this.$refs['moduleForm'].validate(valid => {
+      this.$refs['moduleForm'].validate(async valid => {
         if (valid) {
-          alert('submit!');
+          this.moduleForm.parentId = parseInt(this.moduleForm.parentId);
+          this.moduleForm.status = parseInt(this.moduleForm.status);
+          let res = await api.PostPermissionsModules(this.moduleForm);
+          if (res.code === codes.Success) {
+            this.showPermissionModuleFormModal = false;
+            this.permissionFormModules.push(res.data);
+            this.moduleFormModules.push(res.data);
+            this.$refs['moduleForm'].resetFields();
+            this.$message({
+              message: '模块添加成功',
+              type: 'success'
+            });
+          } else {
+            this.$message({
+              message: res.message,
+              type: 'warning'
+            });
+          }
         } else {
           console.log('error submit!!');
           return false;
@@ -363,6 +386,11 @@ export default {
   .el-table th {
     padding: 5px;
   }
+  // .el-table--border::after,
+  // .el-table--group::after,
+  // .el-table::before {
+  // background-color: #fff;
+  // }
 }
 </style>
 

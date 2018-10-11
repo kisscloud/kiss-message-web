@@ -42,7 +42,7 @@ const handleError = error => {
 
 const handleRequestSuccess = config => {
   /* 在发送请求之前做某事 */
-  config.headers['X-Access-Token'] = localStorage.getItem("access_token");
+  config.headers['X-Access-Token'] = localStorage.getItem("accessToken");
   return config;
 }
 
@@ -84,7 +84,7 @@ class Ajax {
       baseURL: window.config.API_HOST,
       timeout: 10000,
       headers: {
-        'X-Access-Token': ''
+        'Content-Type': 'application/json'
       }
     })
     setGlobal(this.instance)
