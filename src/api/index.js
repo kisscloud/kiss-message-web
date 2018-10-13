@@ -32,6 +32,26 @@ export const AuthLogin = (data, options) => {
   return ajax.post('/kiss-account/auth/username/login', data, options);
 };
 
+// 获取用户页面参数
+export const GetPagePermissonsAccountsParams = (data, options) => {
+  return ajax.get('/kiss-console/page/permission/accounts', data, options);
+};
+
+// 获取角色页面参数
+export const GetPagePermissionRolesParams = (data, options) => {
+  return ajax.get('/kiss-console/page/permission/roles', data, options);
+};
+
+// 获取角色页面参数
+export const GetPagePermissionPermissionsParams = (data, options) => {
+  return ajax.get('/kiss-console/page/permission/permissions', data, options);
+};
+
+// 获取角色页面参数
+export const GetPagePermissionLogsParams = (data, options) => {
+  return ajax.get('/kiss-console/page/permission/logs', data, options);
+};
+
 // 获取用户列表
 export const GetAccounts = (data, options) => {
   return ajax.get('/kiss-account/accounts', data, options);

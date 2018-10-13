@@ -128,7 +128,7 @@ export default [
         component: PermissionRoles
       },
       {
-        path: '/permission/users',
+        path: '/permission/accounts',
         component: PermissionUsers
       },
       {

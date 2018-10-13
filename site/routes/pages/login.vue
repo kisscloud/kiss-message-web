@@ -39,6 +39,7 @@
 
 <script>
 import * as api from './../../../src/api';
+import * as codes from './../../../src/codes';
 
 export default {
   data() {
@@ -67,7 +68,7 @@ export default {
       }
 
       let res = await api.AuthLogin(this.form);
-      if (res.code === 0) {
+      if (res.code === codes.Success) {
         localStorage.setItem('accessToken', res.data.accessToken);
         localStorage.setItem('expiredAt', res.data.expiredAt);
         this.$router.push({ path: '/' });

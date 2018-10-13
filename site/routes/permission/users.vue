@@ -1,24 +1,24 @@
 <template>
-  <c-main id="page-users">
+  <c-main id="page-accounts">
     <header class="toolbar">
       <c-level>
         <template slot="left">
-            <div class="cell">
-              <!-- <div class="cell__media">
-                <i class="icon-footprint"></i>
-              </div> -->
-              <div class="cell__content">
-                <h1 class="toolbar__title">用户管理 <span>管理平台的部门和用户</span></h1>
-              </div>
-            </div>
+                  <div class="cell">
+                    <!-- <div class="cell__media">
+                      <i class="icon-footprint"></i>
+                    </div> -->
+                    <div class="cell__content">
+                      <h1 class="toolbar__title">用户管理 <span>管理平台的部门和用户</span></h1>
+                    </div>
+                  </div>
 </template>
 
 <template slot="right">
-  <c-level-item>
+  <!-- <c-level-item>
     <el-input style="width=300px;" size="small" placeholder="输入用户ID/姓名/邮箱/手机号">
       <el-button slot="append" icon="el-icon-search"></el-button>
     </el-input>
-  </c-level-item>
+  </c-level-item> -->
   <el-dropdown @command="handleCommand">
     <el-button type="primary" size="small">
       添加
@@ -46,6 +46,7 @@
           <el-tree
           :data="groupTree"
           node-key="id"
+          ref="groupTree"
           default-expand-all
           @node-drag-start="handleDragStart"
           @node-drag-enter="handleDragEnter"
@@ -68,7 +69,7 @@
           </div>
 
           <el-table
-            :data="users"
+            :data="accounts"
             border
             style="width: 100%">
             <el-table-column
@@ -77,7 +78,7 @@
               width="180">
             </el-table-column>
             <el-table-column
-              prop="group"
+              prop="groupName"
               label="部门"
               width="180">
             </el-table-column>
@@ -97,18 +98,17 @@
               fixed="right"
               label="操作"
               width="100">
-<template slot-scope="scope">
-  <el-button @click="handleClick(scope.row)" type="text" size="small">
-    查看</el-button>
-  <el-button type="text" size="small">编辑</el-button>
-</template>
+              <span slot-scope="scope">
+                <!-- <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button> -->
+                <el-button type="text" size="small">编辑</el-button>
+              </span>
             </el-table-column>
           </el-table>
           <br>
           <el-pagination
             background
             layout="prev, pager, next"
-            :total="100">
+            :total="accountsCount">
           </el-pagination>
           <br>
         </el-card>
@@ -118,7 +118,7 @@
     <el-dialog title="添加用户" :visible.sync="showUserFormModal">
       <el-form :model="userForm" :rules="userFormRules" ref="userForm">
         <el-form-item label="部门" :label-width="formLabelWidth" prop="groupId">
-          <el-select v-model="userForm.groupId" placeholder="请选择用户所属部门" style="width:100%;">
+          <el-select filterable v-model="userForm.groupId" placeholder="请选择用户所属部门" style="width:100%;">
             <el-option v-for="item in userFormGroups" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
@@ -137,6 +137,9 @@
         <el-form-item label="密码" :label-width="formLabelWidth" prop="password">
           <el-input type="password" v-model="userForm.password" autocomplete="off"></el-input>
         </el-form-item>
+        <el-form-item label="重复密码" :label-width="formLabelWidth" prop="repeatPassword">
+          <el-input type="password" v-model="userForm.repeatPassword" autocomplete="off"></el-input>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="showUserFormModal = false">取 消</el-button>
@@ -147,7 +150,7 @@
     <el-dialog title="添加部门" :visible.sync="showGroupFormModal">
       <el-form :model="groupForm" :rules="groupFormRules" ref="groupForm">
         <el-form-item label="父部门" :label-width="formLabelWidth">
-          <el-select v-model="groupForm.parentId" placeholder="请选择父部门" style="width:100%;">
+          <el-select v-model="groupForm.parentId" filterable placeholder="请选择父部门" style="width:100%;">
             <el-option v-for="item in groupFormGroups" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
@@ -183,7 +186,7 @@ var groupForm = {
 };
 
 export default {
-  name: 'PersmissionUsers',
+  name: 'Persmissionaccounts',
   data() {
     return {
       showUserFormModal: false,
@@ -255,31 +258,9 @@ export default {
           }
         ]
       },
-      users: [
-        {
-          name: '王小虎',
-          group: '开发部',
-          email: 'koyeo@qq.com',
-          mobile: '1882934343',
-          status: '在职'
-        }
-      ],
-      groupTree: [
-        {
-          id: 2,
-          label: '技术部',
-          children: [
-            {
-              id: 4,
-              label: '前端开发'
-            },
-            {
-              id: 5,
-              label: 'JAVA开发'
-            }
-          ]
-        }
-      ],
+      accounts: [],
+      accountsCount: 0,
+      groupTree: [],
       groupFormGroups: [
         {
           id: 0,
@@ -290,7 +271,16 @@ export default {
     };
   },
   async mounted() {
-    let res = api.GetAccounts();
+    let res = await api.GetPagePermissonsAccountsParams();
+    if (res.code === codes.Success) {
+      this.accounts = res.data.accounts.accounts;
+      this.accountsCount = res.data.accounts.count;
+      this.userFormGroups = res.data.groups;
+      res.data.groups.forEach(element => {
+        this.groupFormGroups.push(element);
+        this.appendGroupTreeNode(element);
+      });
+    }
   },
   methods: {
     submitUserForm() {
@@ -300,7 +290,7 @@ export default {
           let res = await api.PostAccounts(this.userForm);
           if (res.code === codes.Success) {
             this.showUserFormModal = false;
-            this.users.push(res.data);
+            this.accounts.push(res.data);
             this.$refs['userForm'].resetFields();
             this.$message({
               message: '用户添加成功',
@@ -327,6 +317,7 @@ export default {
             this.showGroupFormModal = false;
             this.userFormGroups.push(res.data);
             this.groupFormGroups.push(res.data);
+            this.appendGroupTreeNode(res.data);
             this.$refs['groupForm'].resetFields();
             this.$message({
               message: '部门添加成功',
@@ -359,6 +350,24 @@ export default {
           this.openUserFormModal();
           break;
         }
+      }
+    },
+    appendGroupTreeNode(element) {
+      if (element.parentId !== 0) {
+        this.$refs['groupTree'].append(
+          {
+            id: element.id,
+            label: element.name
+          },
+          {
+            id: element.parentId
+          }
+        );
+      } else {
+        this.$refs['groupTree'].append({
+          id: element.id,
+          label: element.name
+        });
       }
     },
     handleDragStart(node, ev) {
@@ -394,7 +403,7 @@ export default {
 </script>
 
 <style lang="scss">
-#page-users {
+#page-accounts {
   .el-aside {
     padding-right: 20px;
   }

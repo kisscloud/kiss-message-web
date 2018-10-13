@@ -13,11 +13,11 @@
           </div>
         </template>
         <template slot="right">
-          <c-level-item>
+          <!-- <c-level-item>
             <el-input style="width=300px;" size="small" placeholder="输入权限名称/权限码">
               <el-button slot="append" icon="el-icon-search"></el-button>
             </el-input>
-          </c-level-item>
+          </c-level-item> -->
           <el-dropdown @command="handleCommand">
             <el-button type="primary" size="small">
               添加
@@ -44,6 +44,7 @@
           <el-tree
           :data="moduleTree"
           node-key="id"
+          ref="moduleTree"
           default-expand-all
           @node-drag-start="handleDragStart"
           @node-drag-enter="handleDragEnter"
@@ -76,20 +77,20 @@
               width="180">
             </el-table-column>
             <el-table-column
-              prop="group"
+              prop="moduleName"
               label="权限模块"
               width="180">
             </el-table-column>
             <el-table-column
-              prop="email"
+              prop="typeText"
               label="类型">
             </el-table-column>
             <el-table-column
-              prop="mobile"
-              label="URI">
+              prop="code"
+              label="权限码">
             </el-table-column>
             <el-table-column
-              prop="status"
+              prop="statusText"
               label="状态">
             </el-table-column>
             <el-table-column
@@ -97,7 +98,7 @@
               label="操作"
               width="100">
               <template slot-scope="scope">
-                <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button>
+                <!-- <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button> -->
                 <el-button type="text" size="small">编辑</el-button>
               </template>
             </el-table-column>
@@ -176,6 +177,20 @@ import * as api from '../../../src/api';
 import * as codes from '../../../src/codes';
 import merge from 'merge';
 
+var moduleForm = {
+  parentId: 0,
+  name: null,
+  status: '1'
+};
+
+var permissionForm = {
+  moduleId: null,
+  name: null,
+  type: '1',
+  code: null,
+  status: '1'
+};
+
 export default {
   name: 'PersmissionUsers',
   data() {
@@ -183,18 +198,8 @@ export default {
       showPermissionModuleFormModal: false,
       showPermissionFormModal: false,
       formLabelWidth: '80px',
-      moduleForm: {
-        parentId: 0,
-        name: null,
-        status: '1'
-      },
-      permissionForm: {
-        moduleId: null,
-        name: null,
-        type: '1',
-        code: null,
-        status: '1'
-      },
+      moduleForm: merge({}, moduleForm),
+      permissionForm: merge({}, permissionForm),
       permissionFormRules: {
         moduleId: [
           { required: true, message: '请选择所属模块', trigger: 'change' }
@@ -226,36 +231,7 @@ export default {
           status: '有效'
         }
       ],
-      moduleTree: [
-        {
-          id: 1,
-          label: '技术部',
-          children: [
-            {
-              id: 4,
-              label: '前端开发'
-            },
-            {
-              id: 5,
-              label: 'JAVA开发'
-            }
-          ]
-        },
-        {
-          id: 2,
-          label: '运营',
-          children: [
-            {
-              id: 5,
-              label: '交易所运营'
-            },
-            {
-              id: 6,
-              label: '交易所运营'
-            }
-          ]
-        }
-      ],
+      moduleTree: [],
       moduleFormModules: [{ id: 0, name: '无' }],
       permissionFormModules: [],
       defaultProps: {
@@ -263,6 +239,17 @@ export default {
         label: 'label'
       }
     };
+  },
+  async mounted() {
+    let res = await api.GetPagePermissionPermissionsParams();
+    if (res.code === codes.Success) {
+      this.permissions = res.data.permissions;
+      this.permissionFormModules = res.data.modules;
+      res.data.modules.forEach(element => {
+        this.appendModuleTreeNode(element);
+        this.moduleFormModules.push(element);
+      });
+    }
   },
   methods: {
     submitPermissionForm() {
@@ -301,7 +288,9 @@ export default {
             this.showPermissionModuleFormModal = false;
             this.permissionFormModules.push(res.data);
             this.moduleFormModules.push(res.data);
+            this.appendModuleTreeNode(res.data);
             this.$refs['moduleForm'].resetFields();
+            this.moduleForm = merge({}, moduleForm);
             this.$message({
               message: '模块添加成功',
               type: 'success'
@@ -333,6 +322,24 @@ export default {
           this.openPermissionModuleFormModal();
           break;
         }
+      }
+    },
+    appendModuleTreeNode(element) {
+      if (element.parentId !== 0) {
+        this.$refs['moduleTree'].append(
+          {
+            id: element.id,
+            label: element.name
+          },
+          {
+            id: element.parentId
+          }
+        );
+      } else {
+        this.$refs['moduleTree'].append({
+          id: element.id,
+          label: element.name
+        });
       }
     },
     handleDragStart(node, ev) {
