@@ -66,6 +66,29 @@
                 :default-expand-all="true"
                 :default-checked-keys="[]"
                 :props="defaultProps">
+                <span class="custom-tree-node" slot-scope="{ node, data }">
+                  <span>{{ node.label }}</span>
+                  <span>
+                    <el-button
+                      type="text"
+                      class="option-type"
+                      size="mini">
+                      {{ data.code ? '权限' : '模块' }}
+                    </el-button>
+                    <el-button
+                      type="text"
+                      class="permission-code"
+                      size="mini">
+                      {{ data.code || '-' }}
+                    </el-button>
+                    <el-button
+                      type="text"
+                      class="permission-description"
+                      size="mini">
+                      {{ data.description || '-' }}
+                    </el-button>
+                  </span>
+                </span>
               </el-tree>
               <br>
               <el-button v-show="permissionTree.length != 0" size="small" type="primary">保存权限</el-button>
@@ -115,190 +138,224 @@
 </template>
 
 <script>
-  import * as api from '../../../src/api';
-  import * as codes from '../../../src/codes';
-  import merge from 'merge';
-  
-  export default {
-    name: 'PersmissionUsers',
-    data() {
-      const generateData2 = _ => {
-        const data = [];
-        const cities = ['张三', '李思', '王五', '赵六', '马七'];
-        const pinyin = [
-          'shanghai',
-          'beijing',
-          'guangzhou',
-          'shenzhen',
-          'nanjing',
-          'xian',
-          'chengdu'
-        ];
-        cities.forEach((city, index) => {
-          data.push({
-            label: city,
-            key: index,
-            pinyin: pinyin[index]
-          });
+import * as api from '../../../src/api';
+import * as codes from '../../../src/codes';
+import merge from 'merge';
+
+export default {
+  name: 'PersmissionUsers',
+  data() {
+    const generateData2 = _ => {
+      const data = [];
+      const cities = ['张三', '李思', '王五', '赵六', '马七'];
+      const pinyin = [
+        'shanghai',
+        'beijing',
+        'guangzhou',
+        'shenzhen',
+        'nanjing',
+        'xian',
+        'chengdu'
+      ];
+      cities.forEach((city, index) => {
+        data.push({
+          label: city,
+          key: index,
+          pinyin: pinyin[index]
         });
-        return data;
-      };
-      return {
-        showRoleFormModal: false,
-        tabActiveName: 'first',
-        data2: generateData2(),
-        value2: [],
-        filterMethod(query, item) {
-          return item.pinyin.indexOf(query) > -1;
-        },
-        roleForm: {
-          name: null,
-          status: '1'
-        },
-        roleFormRules: {
-          name: [{
+      });
+      return data;
+    };
+    return {
+      showRoleFormModal: false,
+      tabActiveName: 'first',
+      data2: generateData2(),
+      value2: [],
+      filterMethod(query, item) {
+        return item.pinyin.indexOf(query) > -1;
+      },
+      roleForm: {
+        name: null,
+        status: '1'
+      },
+      roleFormRules: {
+        name: [
+          {
             required: true,
             message: '请输入角色名称',
             trigger: 'change'
-          }]
-        },
-        roles: [],
-        permissionTree: [],
-        defaultProps: {
-          children: 'children',
-          label: 'label'
-        }
-      };
-    },
-    async mounted() {
-      let res = await api.GetPagePermissionRolesParams();
-  
-      if (res.code === codes.Success) {
-        this.roles = res.data.roles;
-        res.data.modules.forEach(element => {
-          this.appendPermissionTreeNode(element);
-        });
-        res.data.permissions.forEach(element => {
-          this.$refs['permissionTree'].append({
-            id: element.id,
-            label: element.name
-          }, {
-            id: element.moduleId
-          });
-        });
-      }
-    },
-    methods: {
-      submitRoleForm() {
-        this.$refs['roleForm'].validate(async valid => {
-          if (valid) {
-            this.roleForm.status = parseInt(this.roleForm.status);
-            let res = await api.PostRoles(this.roleForm);
-            if (res.code === codes.Success) {
-              this.showRoleFormModal = false;
-              this.roles.push(res.data);
-              this.$refs['roleForm'].resetFields();
-              this.$message({
-                message: '角色添加成功',
-                type: 'success'
-              });
-            } else {
-              this.$message({
-                message: res.message,
-                type: 'warning'
-              });
-            }
-          } else {
-            console.log('error submit!!');
-            return false;
           }
-        });
+        ]
       },
-      openRoleFormModal() {
-        this.showRoleFormModal = true;
-      },
-      handleClick(tab, event) {
-        console.log(tab, event);
-      },
-      appendPermissionTreeNode(element) {
-        if (element.parentId !== 0) {
-          this.$refs['permissionTree'].append({
-            id: element.id,
-            label: element.name
-          }, {
-            id: element.parentId
-          });
-        } else {
-          this.$refs['permissionTree'].append({
-            id: element.id,
-            label: element.name
-          });
-        }
-      },
-      handleDragStart(node, ev) {
-        console.log('drag start', node);
-      },
-      handleDragEnter(draggingNode, dropNode, ev) {
-        console.log('tree drag enter: ', dropNode.label);
-      },
-      handleDragLeave(draggingNode, dropNode, ev) {
-        console.log('tree drag leave: ', dropNode.label);
-      },
-      handleDragOver(draggingNode, dropNode, ev) {
-        console.log('tree drag over: ', dropNode.label);
-      },
-      handleDragEnd(draggingNode, dropNode, dropType, ev) {
-        console.log('tree drag end: ', dropNode && dropNode.label, dropType);
-      },
-      handleDrop(draggingNode, dropNode, dropType, ev) {
-        console.log('tree drop: ', dropNode.label, dropType);
-      },
-      allowDrop(draggingNode, dropNode, type) {
-        if (dropNode.data.label === '二级 3-1') {
-          return type !== 'inner';
-        } else {
-          return true;
-        }
-      },
-      allowDrag(draggingNode) {
-        return draggingNode.data.label.indexOf('三级 3-2-2') === -1;
+      roles: [],
+      permissionTree: [],
+      defaultProps: {
+        children: 'children',
+        label: 'label'
       }
+    };
+  },
+  async mounted() {
+    let res = await api.GetPagePermissionRolesParams();
+
+    if (res.code === codes.Success) {
+      this.roles = res.data.roles;
+      res.data.modules.forEach(element => {
+        this.appendPermissionTreeNode(element);
+      });
+      res.data.permissions.forEach(element => {
+        this.$refs['permissionTree'].append(
+          {
+            id: element.id,
+            label: element.name,
+            code: element.code,
+            description: element.description
+          },
+          {
+            id: element.moduleId
+          }
+        );
+      });
     }
-  };
+  },
+  methods: {
+    submitRoleForm() {
+      this.$refs['roleForm'].validate(async valid => {
+        if (valid) {
+          this.roleForm.status = parseInt(this.roleForm.status);
+          let res = await api.PostRoles(this.roleForm);
+          if (res.code === codes.Success) {
+            this.showRoleFormModal = false;
+            this.roles.push(res.data);
+            this.$refs['roleForm'].resetFields();
+            this.$message({
+              message: '角色添加成功',
+              type: 'success'
+            });
+          } else {
+            this.$message({
+              message: res.message,
+              type: 'warning'
+            });
+          }
+        } else {
+          console.log('error submit!!');
+          return false;
+        }
+      });
+    },
+    openRoleFormModal() {
+      this.showRoleFormModal = true;
+    },
+    handleClick(tab, event) {
+      console.log(tab, event);
+    },
+    appendPermissionTreeNode(element) {
+      if (element.parentId !== 0) {
+        this.$refs['permissionTree'].append(
+          {
+            id: element.id,
+            label: element.name
+          },
+          {
+            id: element.parentId
+          }
+        );
+      } else {
+        this.$refs['permissionTree'].append({
+          id: element.id,
+          label: element.name
+        });
+      }
+    },
+    handleDragStart(node, ev) {
+      console.log('drag start', node);
+    },
+    handleDragEnter(draggingNode, dropNode, ev) {
+      console.log('tree drag enter: ', dropNode.label);
+    },
+    handleDragLeave(draggingNode, dropNode, ev) {
+      console.log('tree drag leave: ', dropNode.label);
+    },
+    handleDragOver(draggingNode, dropNode, ev) {
+      console.log('tree drag over: ', dropNode.label);
+    },
+    handleDragEnd(draggingNode, dropNode, dropType, ev) {
+      console.log('tree drag end: ', dropNode && dropNode.label, dropType);
+    },
+    handleDrop(draggingNode, dropNode, dropType, ev) {
+      console.log('tree drop: ', dropNode.label, dropType);
+    },
+    allowDrop(draggingNode, dropNode, type) {
+      if (dropNode.data.label === '二级 3-1') {
+        return type !== 'inner';
+      } else {
+        return true;
+      }
+    },
+    allowDrag(draggingNode) {
+      return draggingNode.data.label.indexOf('三级 3-2-2') === -1;
+    }
+  }
+};
 </script>
 
 <style lang="scss">
-  #page-roles {
-    .el-aside {
-      padding-right: 30px;
-      .el-card__body {
-        padding: 0;
-      }
-      .el-table {
-        border-style: none;
-        border-radius: 0;
-      }
-    }
-    .el-main {
+#page-roles {
+  .el-aside {
+    padding-right: 30px;
+    .el-card__body {
       padding: 0;
-      .el-card__body {
-        padding: 0;
-      }
-      .el-table {
-        border-style: none;
-        border-radius: 0;
-      }
     }
-    .el-table td,
-    .el-table th {
-      padding: 5px;
-    }
-    .el-transfer-panel {
-      width: calc(50% - 62px);
-    }
-    .icon-pencil {
-      font-size: 13px;
+    .el-table {
+      border-style: none;
+      border-radius: 0;
     }
   }
+  .el-main {
+    padding: 0;
+    .el-card__body {
+      padding: 0;
+    }
+    .el-table {
+      border-style: none;
+      border-radius: 0;
+    }
+  }
+  .el-table td,
+  .el-table th {
+    padding: 5px;
+  }
+  .el-transfer-panel {
+    width: calc(50% - 62px);
+  }
+  .icon-pencil {
+    font-size: 13px;
+  }
+  // tree style
+  .custom-tree-node {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    padding-right: 8px;
+    .el-button--text {
+      color: #a2a2a2;
+    }
+  }
+  .option-type {
+    position: relative;
+    top: 1px;
+  }
+  .permission-code {
+    min-width: 200px;
+    text-align: left;
+  }
+  .permission-description {
+    min-width: 200px;
+    text-align: left;
+  }
+}
 </style>
 

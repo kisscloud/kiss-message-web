@@ -215,22 +215,7 @@ export default {
       moduleFormRules: {
         name: [{ required: true, message: '请输入模块名称', trigger: 'change' }]
       },
-      permissions: [
-        {
-          name: '审核用户提币',
-          group: '交易所业务端',
-          email: '接口',
-          mobile: 'post@kiss-engine/withdraw/audit',
-          status: '有效'
-        },
-        {
-          name: '用户KYC审核',
-          group: '交易所业务端',
-          email: '接口',
-          mobile: 'post@kiss-engine/withdraw/audit',
-          status: '有效'
-        }
-      ],
+      permissions: [],
       moduleTree: [],
       moduleFormModules: [{ id: 0, name: '无' }],
       permissionFormModules: [],
@@ -262,6 +247,7 @@ export default {
             this.showPermissionFormModal = false;
             this.permissions.push(res.data);
             this.$refs['permissionForm'].resetFields();
+            this.permissionForm = merge({}, permissionForm);
             this.$message({
               message: '权限添加成功',
               type: 'success'

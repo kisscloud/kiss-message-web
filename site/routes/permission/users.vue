@@ -104,12 +104,12 @@
               </span>
             </el-table-column>
           </el-table>
-          <br>
+          <!-- <br>
           <el-pagination
             background
             layout="prev, pager, next"
             :total="accountsCount">
-          </el-pagination>
+          </el-pagination> -->
           <br>
         </el-card>
       </el-main>
