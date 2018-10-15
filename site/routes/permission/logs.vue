@@ -49,6 +49,10 @@
               prop="email"
               label="操作类型">
             </el-table-column>
+                <el-table-column
+              prop="email"
+              label="权限码">
+            </el-table-column>
             <el-table-column
               prop="mobile"
               label="操作前的值">

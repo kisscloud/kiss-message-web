@@ -33,8 +33,10 @@
           </div>
           <el-table
             :data="roles"
-            stripe
+            ref="roleTable"
             :show-header="false"
+            :highlight-current-row="true"
+            @current-change="handleCurrentChange"
             style="width: 100%">
             <el-table-column
               prop="name"
@@ -91,7 +93,7 @@
                 </span>
               </el-tree>
               <br>
-              <el-button v-show="permissionTree.length != 0" size="small" type="primary">保存权限</el-button>
+              <el-button v-show="permissionTree.length != 0" size="small" type="primary" @click="savePermissions()">保存权限</el-button>
             </el-tab-pane>
             <el-tab-pane label="分配用户" name="second">
               <el-transfer
@@ -105,7 +107,7 @@
                 :data="data2">
               </el-transfer>
               <br>
-              <el-button size="small" type="primary">保存用户</el-button>
+              <el-button size="small" type="primary" @click="saveAccounts()">保存用户</el-button>
             </el-tab-pane>
           </el-tabs>
       </el-main>
@@ -174,6 +176,7 @@ export default {
       filterMethod(query, item) {
         return item.pinyin.indexOf(query) > -1;
       },
+      selectRole: {},
       roleForm: {
         name: null,
         status: '1'
@@ -200,6 +203,10 @@ export default {
 
     if (res.code === codes.Success) {
       this.roles = res.data.roles;
+      if (this.roles.length > 0) {
+        this.selectRole = this.roles[0];
+        this.$refs.roleTable.setCurrentRow(this.roles[0]);
+      }
       res.data.modules.forEach(element => {
         this.appendPermissionTreeNode(element);
       });
@@ -267,6 +274,40 @@ export default {
           label: element.name
         });
       }
+    },
+    async savePermissions() {
+      let permissions = [];
+      this.$refs['permissionTree'].getCheckedNodes().forEach(element => {
+        if (typeof element.code !== 'undefined' && element.code) {
+          permissions.push(element.id);
+        }
+      });
+      if (permissions.length === 0) {
+        this.$message({
+          message: '请选择权限',
+          type: 'info'
+        });
+        return;
+      }
+      let res = await api.PostRolePermissions({
+        roleId: this.selectRole.id,
+        permissions: permissions
+      });
+      if (res.code === codes.Success) {
+        this.$message({
+          message: '权限绑定成功',
+          type: 'success'
+        });
+      } else {
+        this.$message({
+          message: res.message,
+          type: 'warning'
+        });
+      }
+    },
+    async saveAccounts() {},
+    handleCurrentChange(val) {
+      this.selectRole = val;
     },
     handleDragStart(node, ev) {
       console.log('drag start', node);
