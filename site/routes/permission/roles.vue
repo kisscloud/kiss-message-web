@@ -47,9 +47,8 @@
               width="60px"
               align="right"
               label="操作">
-              <span slot-scope="scope">
-                <el-button type="text" size="small">
-                  <i class="icon-pencil"></i></el-button>
+              <span slot-scope="scope" style="float:right;">
+                <el-button @click="openEditRoleModal(scope.row)" class="icon-pen5" type="text" size="mini"></el-button>
               </span>
             </el-table-column>
           </el-table>
@@ -66,17 +65,11 @@
                 show-checkbox
                 node-key="id"
                 :default-expand-all="true"
-                :default-checked-keys="[]"
+                :default-checked-keys="selectPermissions"
                 :props="defaultProps">
                 <span class="custom-tree-node" slot-scope="{ node, data }">
                   <span>{{ node.label }}</span>
                   <span>
-                    <el-button
-                      type="text"
-                      class="option-type"
-                      size="mini">
-                      {{ data.code ? '权限' : '模块' }}
-                    </el-button>
                     <el-button
                       type="text"
                       class="permission-code"
@@ -85,10 +78,22 @@
                     </el-button>
                     <el-button
                       type="text"
+                      class="option-type"
+                      size="mini">
+                      {{ data.type }}
+                    </el-button>
+                    <el-button
+                      type="text"
+                      class="option-type"
+                      size="mini">
+                      {{ data.code ? '权限' : '模块' }}
+                    </el-button>
+                    <!-- <el-button
+                      type="text"
                       class="permission-description"
                       size="mini">
                       {{ data.description || '-' }}
-                    </el-button>
+                    </el-button> -->
                   </span>
                 </span>
               </el-tree>
@@ -101,10 +106,10 @@
                 filterable
                 :filter-method="filterMethod"
                 filter-placeholder="输入用户名"
-                :titles="['已分配用户', '未分配用户']"
-                 :button-texts="['分配', '移除']"
-                v-model="value2"
-                :data="data2">
+                :titles="['未分配用户', '已分配用户']"
+                :button-texts="['移除','分配']"
+                v-model="selectAccounts"
+                :data="accounts">
               </el-transfer>
               <br>
               <el-button size="small" type="primary" @click="saveAccounts()">保存用户</el-button>
@@ -147,36 +152,16 @@ import merge from 'merge';
 export default {
   name: 'PersmissionUsers',
   data() {
-    const generateData2 = _ => {
-      const data = [];
-      const cities = ['张三', '李思', '王五', '赵六', '马七'];
-      const pinyin = [
-        'shanghai',
-        'beijing',
-        'guangzhou',
-        'shenzhen',
-        'nanjing',
-        'xian',
-        'chengdu'
-      ];
-      cities.forEach((city, index) => {
-        data.push({
-          label: city,
-          key: index,
-          pinyin: pinyin[index]
-        });
-      });
-      return data;
-    };
     return {
       showRoleFormModal: false,
       tabActiveName: 'first',
-      data2: generateData2(),
-      value2: [],
-      filterMethod(query, item) {
-        return item.pinyin.indexOf(query) > -1;
-      },
       selectRole: {},
+      selectPermissions: [],
+      accounts: [],
+      selectAccounts: [],
+      filterMethod(query, item) {
+        return item.label.indexOf(query) > -1;
+      },
       roleForm: {
         name: null,
         status: '1'
@@ -203,15 +188,25 @@ export default {
 
     if (res.code === codes.Success) {
       this.roles = res.data.roles;
+      this.selectPermissions = res.data.firstRolePermissions;
+      this.selectAccounts = res.data.firstRoleAccounts;
+
+      res.data.modules.forEach(element => {
+        this.appendPermissionTreeNode(element);
+      });
       if (this.roles.length > 0) {
         this.selectRole = this.roles[0];
         this.$refs.roleTable.setCurrentRow(this.roles[0]);
       }
-      res.data.modules.forEach(element => {
-        this.appendPermissionTreeNode(element);
+      res.data.accounts.accounts.forEach(element => {
+        console.log(element);
+        this.accounts.push({
+          label: element.name,
+          key: element.id
+        });
       });
       res.data.permissions.forEach(element => {
-        this.$refs['permissionTree'].append(
+        this.$refs.permissionTree.append(
           {
             id: element.id,
             label: element.name,
@@ -219,7 +214,7 @@ export default {
             description: element.description
           },
           {
-            id: element.moduleId
+            id: 'module' + element.moduleId
           }
         );
       });
@@ -230,20 +225,37 @@ export default {
       this.$refs['roleForm'].validate(async valid => {
         if (valid) {
           this.roleForm.status = parseInt(this.roleForm.status);
-          let res = await api.PostRoles(this.roleForm);
-          if (res.code === codes.Success) {
-            this.showRoleFormModal = false;
-            this.roles.push(res.data);
-            this.$refs['roleForm'].resetFields();
-            this.$message({
-              message: '角色添加成功',
-              type: 'success'
-            });
+
+          if (this.roleForm.id) {
+            let res = await api.PutRoles(this.roleForm);
+            if (res.code === codes.Success) {
+              this.showRoleFormModal = false;
+              // this.roles.push(res.data);
+              this.$message({
+                message: '角色更新成功',
+                type: 'success'
+              });
+            } else {
+              this.$message({
+                message: res.message,
+                type: 'warning'
+              });
+            }
           } else {
-            this.$message({
-              message: res.message,
-              type: 'warning'
-            });
+            let res = await api.PostRoles(this.roleForm);
+            if (res.code === codes.Success) {
+              this.showRoleFormModal = false;
+              this.roles.push(res.data);
+              this.$message({
+                message: '角色添加成功',
+                type: 'success'
+              });
+            } else {
+              this.$message({
+                message: res.message,
+                type: 'warning'
+              });
+            }
           }
         } else {
           console.log('error submit!!');
@@ -253,6 +265,18 @@ export default {
     },
     openRoleFormModal() {
       this.showRoleFormModal = true;
+      this.roleForm = merge({}, roleForm);
+      if (this.$refs.roleForm) {
+        this.$refs.roleForm.resetFields();
+      }
+    },
+    openEditRoleModal(data) {
+      this.showRoleFormModal = true;
+      if (this.$refs.roleForm) {
+        this.$refs.roleForm.resetFields();
+      }
+      this.roleForm = merge({}, data);
+      this.roleForm.status = `${data.status}`;
     },
     handleClick(tab, event) {
       console.log(tab, event);
@@ -261,16 +285,16 @@ export default {
       if (element.parentId !== 0) {
         this.$refs['permissionTree'].append(
           {
-            id: element.id,
+            id: 'module' + element.id,
             label: element.name
           },
           {
-            id: element.parentId
+            id: 'module' + element.parentId
           }
         );
       } else {
         this.$refs['permissionTree'].append({
-          id: element.id,
+          id: 'module' + element.id,
           label: element.name
         });
       }
@@ -305,9 +329,46 @@ export default {
         });
       }
     },
-    async saveAccounts() {},
-    handleCurrentChange(val) {
+    async saveAccounts() {
+      if (this.selectAccounts.length === 0) {
+        this.$message({
+          message: '请选择用户',
+          type: 'info'
+        });
+        return;
+      }
+      let res = await api.PostRolesAccounts({
+        id: this.selectRole.id,
+        accountIds: this.selectAccounts
+      });
+      if (res.code === codes.Success) {
+        this.$message({
+          message: '用户绑定成功',
+          type: 'success'
+        });
+      } else {
+        this.$message({
+          message: res.message,
+          type: 'warning'
+        });
+      }
+    },
+    async handleCurrentChange(val) {
       this.selectRole = val;
+      let res = await api.GetRolePermissionsAndAccountIds({
+        id: val.id
+      });
+      if (res.code === codes.Success) {
+        if (this.$refs.permissionTree) {
+          this.$refs.permissionTree.setCheckedKeys(res.data.permissions);
+        }
+        this.selectAccounts = res.data.accounts;
+      } else {
+        this.$message({
+          message: res.message,
+          type: 'warning'
+        });
+      }
     },
     handleDragStart(node, ev) {
       console.log('drag start', node);
@@ -328,14 +389,14 @@ export default {
       console.log('tree drop: ', dropNode.label, dropType);
     },
     allowDrop(draggingNode, dropNode, type) {
-      if (dropNode.data.label === '二级 3-1') {
-        return type !== 'inner';
-      } else {
-        return true;
-      }
+      // if (dropNode.data.label === '二级 3-1') {
+      //   return type !== 'inner';
+      // } else {
+      //   return true;
+      // }
     },
     allowDrag(draggingNode) {
-      return draggingNode.data.label.indexOf('三级 3-2-2') === -1;
+      // return draggingNode.data.label.indexOf('三级 3-2-2') === -1;
     }
   }
 };
@@ -351,6 +412,10 @@ export default {
     .el-table {
       border-style: none;
       border-radius: 0;
+    }
+    .el-table th,
+    .el-table tr {
+      cursor: pointer;
     }
   }
   .el-main {
@@ -373,6 +438,19 @@ export default {
   .icon-pencil {
     font-size: 13px;
   }
+  // role list style
+
+  .icon-pen5 {
+    color: #409eff;
+    font-size: 12px;
+    visibility: hidden;
+  }
+  .el-table__row:hover {
+    .icon-pen5 {
+      visibility: visible;
+    }
+  }
+
   // tree style
   .custom-tree-node {
     flex: 1;

@@ -54,40 +54,70 @@ export const GetPagePermissionLogsParams = (data, options) => {
 
 // 获取用户列表
 export const GetAccounts = (data, options) => {
-  return ajax.get('/kiss-account/accounts', data, options);
+  return ajax.get('/kiss-account/account', data, options);
 };
 
 // 添加部门
 export const PostAccountsGroups = (data, options) => {
-  return ajax.post('/kiss-account/accounts/groups', data, options);
+  return ajax.post('/kiss-account/account/groups', data, options);
+};
+
+// 编辑部门
+export const PutAccountsGroups = (data, options) => {
+  return ajax.put('/kiss-account/account/group', data, options);
 };
 
 // 添加用户
 export const PostAccounts = (data, options) => {
-  return ajax.post('/kiss-account/accounts', data, options);
+  return ajax.post('/kiss-account/account', data, options);
+};
+
+// 更改用户
+export const PutAccounts = (data, options) => {
+  return ajax.put('/kiss-account/account', data, options);
 };
 
 // 添加权限
 export const PostPermissions = (data, options) => {
-  return ajax.post('/kiss-account/permissions', data, options);
+  return ajax.post('/kiss-account/permission', data, options);
 };
 
 // 添加权限模块
 export const PostPermissionsModules = (data, options) => {
-  return ajax.post('/kiss-account/permissions/modules', data, options);
+  return ajax.post('/kiss-account/permission/module', data, options);
 };
 
 // 添加角色
 export const PostRoles = (data, options) => {
-  return ajax.post('/kiss-account/roles', data, options);
+  return ajax.post('/kiss-account/role', data, options);
+};
+
+// 编辑角色
+export const PutRoles = (data, options) => {
+  return ajax.put('/kiss-account/role', data, options);
+};
+
+// 获取角色绑定权限
+export const GetRolePermissionIds = (data, options) => {
+  return ajax.get('/kiss-account/role/permissionIds', data, options);
+};
+
+// 获取角色绑定的账户
+export const GetRoleAccountIds = (data, options) => {
+  return ajax.get('/kiss-account/role/accountIds', data, options);
+};
+
+// 获取角色绑定的账户和权限
+export const GetRolePermissionsAndAccountIds = (data, options) => {
+  return ajax.get('/kiss-console/account/role/accountIds/permissionIds', data, options);
 };
 
 // 绑定角色权限
 export const PostRolePermissions = (data, options) => {
-  return ajax.post('/kiss-account/roles/permissions', data, options);
+  return ajax.post('/kiss-account/role/permissions', data, options);
 };
 
 // 绑定角色用户
 export const PostRolesAccounts = (data, options) => {
-  return ajax.post('/kiss-account/accounts/roles', data, options);
+  return ajax.post('/kiss-account/role/accounts', data, options);
 };

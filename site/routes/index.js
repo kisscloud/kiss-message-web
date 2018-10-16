@@ -71,10 +71,11 @@ import HomeView from './home.vue';
 
 // Pages
 const AuthLogin = () => import('./pages/login.vue');
-// const RegisterView = () => import('./pages/register.vue');
+const TwoFactor = () => import('./pages/two-factor.vue');
+const RegisterView = () => import('./pages/register.vue');
 const ForgotView = () => import('./pages/forgot.vue');
 const ResetView = () => import('./pages/reset.vue');
-// const ErrorView = () => import('./pages/error.vue');
+const ErrorView = () => import('./pages/error.vue');
 
 const PermissionUsers = () => import('./permission/users.vue');
 const PermissionPermissions = () => import('./permission/permissions.vue');
@@ -83,25 +84,29 @@ const PermissionLogs = () => import('./permission/logs.vue');
 
 export default [
   {
-    path: '/login',
+    path: '/auth/login',
     component: AuthLogin
   },
-  // {
-  //   path: '/register',
-  //   component: RegisterView
-  // },
   {
-    path: '/forgot',
+    path: '/auth/two-factor',
+    component: TwoFactor
+  },
+  {
+    path: '/auth/register',
+    component: RegisterView
+  },
+  {
+    path: '/auth/forgot',
     component: ForgotView
   },
   {
-    path: '/reset',
+    path: '/auth/reset',
     component: ResetView
   },
-  // {
-  //   path: '/error',
-  //   component: ErrorView
-  // },
+  {
+    path: '/error',
+    component: ErrorView
+  },
 
   // Templates
   // {

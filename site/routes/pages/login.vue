@@ -16,7 +16,7 @@
             <c-form-field>
               <c-level>
                 <c-form-checkbox label="记住我" slot="left"></c-form-checkbox>
-                <router-link to="/forgot" slot="right">忘记密码？</router-link>
+                <router-link to="/auth/forgot" slot="right">忘记密码？</router-link>
               </c-level>
             </c-form-field>
             <c-button type="primary" @click.prevent="login" block>登录</c-button>

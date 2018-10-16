@@ -54,9 +54,22 @@
           @node-drag-over="handleDragOver"
           @node-drag-end="handleDragEnd"
           @node-drop="handleDrop"
-          draggable
+          @node-click="clickModule"
+          :expand-on-click-node="false"
+          :highlight-current="true"
           :allow-drop="allowDrop"
           :allow-drag="allowDrag">
+          <span class="custom-tree-node" slot-scope="{ node, data }">
+                  <span>{{ node.label }}</span>
+                  <span>
+                    <el-button
+                      type="text"
+                      class="icon-pen5"
+                      @click="openEditGroup(data)"
+                      size="mini">
+                    </el-button>
+                  </span>
+           </span>
           </el-tree>
           </el-card>
       </el-aside>
@@ -69,7 +82,7 @@
           </div>
 
           <el-table
-            :data="accounts"
+            :data="showAccounts"
             border
             style="width: 100%">
             <el-table-column
@@ -97,10 +110,11 @@
             <el-table-column
               fixed="right"
               label="操作"
-              width="100">
+              width="150">
               <span slot-scope="scope">
                 <!-- <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button> -->
-                <el-button type="text" size="small">编辑</el-button>
+                <el-button type="text" size="small" @click="openEditAccount(scope.row)">编辑</el-button>
+                <el-button type="text" size="small" @click="clickDimission(scope.row)">离职</el-button>
               </span>
             </el-table-column>
           </el-table>
@@ -110,16 +124,15 @@
             layout="prev, pager, next"
             :total="accountsCount">
           </el-pagination> -->
-          <br>
         </el-card>
       </el-main>
     </el-container>
     
-    <el-dialog title="添加用户" :visible.sync="showUserFormModal">
-      <el-form :model="userForm" :rules="userFormRules" ref="userForm">
+    <el-dialog :title="userForm.id ? '编辑用户':'添加用户'" :visible.sync="showUserFormModal">
+      <el-form :model="userForm" :rules="userFormRules" ref="userForm" :validate-on-rule-change="false">
         <el-form-item label="部门" :label-width="formLabelWidth" prop="groupId">
           <el-select filterable v-model="userForm.groupId" placeholder="请选择用户所属部门" style="width:100%;">
-            <el-option v-for="item in userFormGroups" :label="item.name" :value="item.id"></el-option>
+            <el-option v-for="item in userFormGroups" v-bind:key="'userGroup'+item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="姓名" :label-width="formLabelWidth" prop="name">
@@ -134,10 +147,10 @@
         <el-form-item label="手机" :label-width="formLabelWidth" prop="mobile">
           <el-input v-model="userForm.mobile" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="密码" :label-width="formLabelWidth" prop="password">
+        <el-form-item v-show="!userForm.id" label="密码" :label-width="formLabelWidth" prop="password">
           <el-input type="password" v-model="userForm.password" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="重复密码" :label-width="formLabelWidth" prop="repeatPassword">
+        <el-form-item v-show="!userForm.id" label="重复密码" :label-width="formLabelWidth" prop="repeatPassword">
           <el-input type="password" v-model="userForm.repeatPassword" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
@@ -147,11 +160,11 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="添加部门" :visible.sync="showGroupFormModal">
+    <el-dialog :title="groupForm.id ? '编辑部门':'添加部门'" :visible.sync="showGroupFormModal">
       <el-form :model="groupForm" :rules="groupFormRules" ref="groupForm">
         <el-form-item label="父部门" :label-width="formLabelWidth">
           <el-select v-model="groupForm.parentId" filterable placeholder="请选择父部门" style="width:100%;">
-            <el-option v-for="item in groupFormGroups" :label="item.name" :value="item.id"></el-option>
+            <el-option v-for="item in groupFormGroups" v-bind:key="'groupFromGroups'+item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="部门名称" :label-width="formLabelWidth" prop="name">
@@ -172,6 +185,7 @@ import * as codes from '../../../src/codes';
 import merge from 'merge';
 
 var userForm = {
+  id: null,
   groupId: null,
   name: null,
   username: null,
@@ -181,8 +195,81 @@ var userForm = {
 };
 
 var groupForm = {
+  id: null,
   parentId: 0,
   name: null
+};
+
+var createUserRules = {
+  password: [
+    {
+      required: true,
+      message: '请输入密码',
+      trigger: 'change'
+    },
+    {
+      min: 8,
+      max: 20,
+      message: '请输入8到20位密码',
+      trigger: 'blur'
+    }
+  ],
+  repeatPassword: [
+    {
+      required: true,
+      message: '请输入重复密码',
+      trigger: 'change'
+    },
+    {
+      min: 8,
+      max: 20,
+      message: '请输入8到20位密码',
+      trigger: 'blur'
+    }
+  ]
+};
+
+var updateUserRules = {
+  groupId: [
+    {
+      required: true,
+      message: '请选择部门',
+      trigger: 'change'
+    }
+  ],
+  name: [
+    {
+      required: true,
+      message: '请输入姓名',
+      trigger: 'change'
+    }
+  ],
+  username: [
+    {
+      required: true,
+      message: '请输入用户名',
+      trigger: 'change'
+    }
+  ],
+  email: [
+    {
+      required: true,
+      message: '请输入邮箱',
+      trigger: 'change'
+    },
+    {
+      type: 'email',
+      message: '请输入正确的邮箱',
+      trigger: 'change'
+    }
+  ],
+  mobile: [
+    {
+      required: true,
+      message: '请输入手机号',
+      trigger: 'change'
+    }
+  ]
 };
 
 export default {
@@ -194,61 +281,7 @@ export default {
       formLabelWidth: '80px',
       userForm: merge({}, userForm),
       groupForm: merge({}, groupForm),
-      userFormRules: {
-        groupId: [
-          {
-            required: true,
-            message: '请选择部门',
-            trigger: 'change'
-          }
-        ],
-        name: [
-          {
-            required: true,
-            message: '请输入姓名',
-            trigger: 'change'
-          }
-        ],
-        username: [
-          {
-            required: true,
-            message: '请输入用户名',
-            trigger: 'change'
-          }
-        ],
-        email: [
-          {
-            required: true,
-            message: '请输入邮箱',
-            trigger: 'change'
-          },
-          {
-            type: 'email',
-            message: '请输入正确的邮箱',
-            trigger: 'change'
-          }
-        ],
-        mobile: [
-          {
-            required: true,
-            message: '请输入手机号',
-            trigger: 'change'
-          }
-        ],
-        password: [
-          {
-            required: true,
-            message: '请输入密码',
-            trigger: 'change'
-          },
-          {
-            min: 8,
-            max: 20,
-            message: '请输入8到20位密码',
-            trigger: 'blur'
-          }
-        ]
-      },
+      userFormRules: {},
       groupFormRules: {
         name: [
           {
@@ -259,6 +292,7 @@ export default {
         ]
       },
       accounts: [],
+      showAccounts: [],
       accountsCount: 0,
       groupTree: [],
       groupFormGroups: [
@@ -274,8 +308,17 @@ export default {
     let res = await api.GetPagePermissonsAccountsParams();
     if (res.code === codes.Success) {
       this.accounts = res.data.accounts.accounts;
+      this.showAccounts = res.data.accounts.accounts;
       this.accountsCount = res.data.accounts.count;
       this.userFormGroups = res.data.groups;
+      this.appendGroupTreeNode({
+        id: 0,
+        name: '所有部门',
+        parentId: 0
+      });
+      this.$refs.groupTree.setCurrentKey({
+        id: 0
+      });
       res.data.groups.forEach(element => {
         this.groupFormGroups.push(element);
         this.appendGroupTreeNode(element);
@@ -287,20 +330,49 @@ export default {
       this.$refs['userForm'].validate(async valid => {
         if (valid) {
           this.userForm.groupId = parseInt(this.userForm.groupId);
-          let res = await api.PostAccounts(this.userForm);
-          if (res.code === codes.Success) {
-            this.showUserFormModal = false;
-            this.accounts.push(res.data);
-            this.$refs['userForm'].resetFields();
-            this.$message({
-              message: '用户添加成功',
-              type: 'success'
-            });
+
+          if (this.userForm.id) {
+            let res = await api.PutAccounts(this.userForm);
+            if (res.code === codes.Success) {
+              this.showUserFormModal = false;
+              for (let i = 0; i < this.accounts.length; i++) {
+                if (this.accounts[i].id === res.data.id) {
+                  this.accounts[i] = res.data;
+                  break;
+                }
+              }
+              for (let i = 0; i < this.showAccounts.length; i++) {
+                if (this.showAccounts[i].id === res.data.id) {
+                  this.showAccounts[i] = res.data;
+                  break;
+                }
+              }
+              this.$message({
+                message: '用户更新成功',
+                type: 'success'
+              });
+            } else {
+              this.$message({
+                message: res.message,
+                type: 'warning'
+              });
+            }
           } else {
-            this.$message({
-              message: res.message,
-              type: 'warning'
-            });
+            let res = await api.PostAccounts(this.userForm);
+            if (res.code === codes.Success) {
+              this.showUserFormModal = false;
+              this.accounts.push(res.data);
+              this.showAccounts.push(res.data);
+              this.$message({
+                message: '用户添加成功',
+                type: 'success'
+              });
+            } else {
+              this.$message({
+                message: res.message,
+                type: 'warning'
+              });
+            }
           }
         } else {
           console.log('error submit!!');
@@ -312,22 +384,55 @@ export default {
       this.$refs['groupForm'].validate(async valid => {
         if (valid) {
           this.groupForm.parentId = parseInt(this.groupForm.parentId);
-          let res = await api.PostAccountsGroups(this.groupForm);
-          if (res.code === codes.Success) {
-            this.showGroupFormModal = false;
-            this.userFormGroups.push(res.data);
-            this.groupFormGroups.push(res.data);
-            this.appendGroupTreeNode(res.data);
-            this.$refs['groupForm'].resetFields();
-            this.$message({
-              message: '部门添加成功',
-              type: 'success'
-            });
+
+          if (this.groupForm.id) {
+            let res = await api.PutAccountsGroups(this.groupForm);
+            if (res.code === codes.Success) {
+              this.showGroupFormModal = false;
+              for (let i = 0; i < this.userFormGroups.length; i++) {
+                if (this.userFormGroups[i].id === res.data.id) {
+                  this.userFormGroups[i] = res.data;
+                  break;
+                }
+              }
+              for (let i = 0; i < this.groupFormGroups.length; i++) {
+                if (this.groupFormGroups[i].id === res.data.id) {
+                  this.groupFormGroups[i] = res.data;
+                  break;
+                }
+              }
+              let node = this.$refs.groupTree.getNode({
+                id: res.data.id
+              });
+              node.data.name = res.data.name;
+              node.data.label = res.data.name;
+              this.$message({
+                message: '部门更新成功',
+                type: 'success'
+              });
+            } else {
+              this.$message({
+                message: res.message,
+                type: 'warning'
+              });
+            }
           } else {
-            this.$message({
-              message: res.message,
-              type: 'warning'
-            });
+            let res = await api.PostAccountsGroups(this.groupForm);
+            if (res.code === codes.Success) {
+              this.showGroupFormModal = false;
+              this.userFormGroups.push(res.data);
+              this.groupFormGroups.push(res.data);
+              this.appendGroupTreeNode(res.data);
+              this.$message({
+                message: '部门添加成功',
+                type: 'success'
+              });
+            } else {
+              this.$message({
+                message: res.message,
+                type: 'warning'
+              });
+            }
           }
         } else {
           console.log('error submit!!');
@@ -335,12 +440,38 @@ export default {
         }
       });
     },
+    openEditAccount(account) {
+      this.showUserFormModal = true;
+      this.userFormRules = merge({}, updateUserRules);
+      this.userForm = merge({}, account);
+      if (typeof this.$refs.userForm !== 'undefined') {
+        this.$refs.userForm.resetFields();
+      }
+    },
     openUserFormModal() {
       this.showUserFormModal = true;
+      this.userFormRules = merge({}, updateUserRules, createUserRules);
+      this.userForm = merge({}, userForm);
+      if (typeof this.$refs.userForm !== 'undefined') {
+        this.$refs.userForm.resetFields();
+      }
     },
     openGroupFormModal() {
       this.showGroupFormModal = true;
+      this.groupForm = merge({}, groupForm);
+      if (typeof this.$refs.groupForm !== 'undefined') {
+        this.$refs.groupForm.resetFields();
+      }
     },
+    openEditGroup(group) {
+      this.showGroupFormModal = true;
+      this.groupForm = merge({}, group);
+      if (typeof this.$refs.groupForm !== 'undefined') {
+        this.$refs.groupForm.resetFields();
+      }
+    },
+    clickDimission(account) {},
+    async submitDimission(account) {},
     handleCommand(command) {
       switch (command) {
         case 'group':
@@ -353,11 +484,13 @@ export default {
       }
     },
     appendGroupTreeNode(element) {
-      if (element.parentId !== 0) {
+      if (element.id !== 0) {
         this.$refs['groupTree'].append(
           {
             id: element.id,
-            label: element.name
+            label: element.name,
+            name: element.name,
+            parentId: element.parentId
           },
           {
             id: element.parentId
@@ -367,6 +500,18 @@ export default {
         this.$refs['groupTree'].append({
           id: element.id,
           label: element.name
+        });
+      }
+    },
+    clickModule(data) {
+      if (data.id === 0) {
+        this.showAccounts = this.accounts;
+      } else {
+        this.showAccounts = [];
+        this.accounts.forEach(element => {
+          if (element.groupId === data.id) {
+            this.showAccounts.push(merge({}, element));
+          }
         });
       }
     },
@@ -429,6 +574,25 @@ export default {
     width: 100%;
     height: 100%;
     color: red;
+  }
+  // tree style
+  .custom-tree-node {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    padding-right: 8px;
+    .el-button--text {
+      color: #409eff;
+      font-size: 12px;
+      display: none;
+    }
+    &:hover {
+      .el-button--text {
+        display: initial;
+      }
+    }
   }
 }
 </style>

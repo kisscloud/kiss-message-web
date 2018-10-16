@@ -96,16 +96,23 @@ class Ajax {
     return axios.spread
   }
   get(url, params, options) {
-    const instance = this.instance.get(
-      url,
-      merge({
-        params
-      }, setOption.setConfig(this.options.config()), options)
-    )
+    const instance = this.instance.get(url, merge({
+      params
+    }, setOption.setConfig(this.options.config()), options))
+    return instance
+  }
+  delete(url, params, options) {
+    const instance = this.instance.delete(url, merge({
+      params
+    }, setOption.setConfig(this.options.config()), options))
     return instance
   }
   post(url, params, options) {
-    const instance = this.instance.post(
+    const instance = this.instance.post(url, params, merge(setOption.setConfig(this.options.config()), options))
+    return instance
+  }
+  put(url, params, options) {
+    const instance = this.instance.put(
       url,
       params,
       merge(setOption.setConfig(this.options.config()), options)

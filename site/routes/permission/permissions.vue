@@ -1,34 +1,35 @@
 <template>
   <c-main id="page-permissions">
-   <header class="toolbar">
+    <header class="toolbar">
       <c-level>
         <template slot="left">
-          <div class="cell">
-            <!-- <div class="cell__media">
-              <i class="icon-footprint"></i>
-            </div> -->
-            <div class="cell__content">
-              <h1 class="toolbar__title">权限管理 <span>管理平台所有的功能权限</span></h1>
+            <div class="cell">
+              <!-- <div class="cell__media">
+                <i class="icon-footprint"></i>
+              </div> -->
+              <div class="cell__content">
+                <h1 class="toolbar__title">权限管理 <span>管理平台所有的功能权限</span></h1>
+              </div>
             </div>
-          </div>
-        </template>
-        <template slot="right">
-          <!-- <c-level-item>
-            <el-input style="width=300px;" size="small" placeholder="输入权限名称/权限码">
-              <el-button slot="append" icon="el-icon-search"></el-button>
-            </el-input>
-          </c-level-item> -->
-          <el-dropdown @command="handleCommand">
-            <el-button type="primary" size="small">
-              添加
-            </el-button>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item command="permission">添加权限</el-dropdown-item>
-              <el-dropdown-item command="module">添加模块</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-          <!-- <c-level-item><c-button icon-start="icon-plus-circle" type="info" smart>添加</c-button></c-level-item> -->
-        </template>
+</template>
+
+<template slot="right">
+  <!-- <c-level-item>
+              <el-input style="width=300px;" size="small" placeholder="输入权限名称/权限码">
+                <el-button slot="append" icon="el-icon-search"></el-button>
+              </el-input>
+            </c-level-item> -->
+  <el-dropdown @command="handleCommand">
+    <el-button type="primary" size="small">
+      添加
+    </el-button>
+    <el-dropdown-menu slot="dropdown">
+      <el-dropdown-item command="permission">添加权限</el-dropdown-item>
+      <el-dropdown-item command="module">添加模块</el-dropdown-item>
+    </el-dropdown-menu>
+  </el-dropdown>
+  <!-- <c-level-item><c-button icon-start="icon-plus-circle" type="info" smart>添加</c-button></c-level-item> -->
+</template>
       </c-level>
     </header>
     
@@ -52,9 +53,22 @@
           @node-drag-over="handleDragOver"
           @node-drag-end="handleDragEnd"
           @node-drop="handleDrop"
-          draggable
+          @node-click="clickModule"
+          :highlight-current="true"
+          :expand-on-click-node="false"
           :allow-drop="allowDrop"
           :allow-drag="allowDrag">
+          <span class="custom-tree-node" slot-scope="{ node, data }">
+              <span>{{ node.label }}</span>
+                <span>
+                  <el-button
+                    type="text"
+                    class="icon-pen5"
+                    @click="openEditGroup(data)"
+                    size="mini">
+                  </el-button>
+                </span>
+           </span>
           </el-tree>
           </el-card>
       </el-aside>
@@ -68,7 +82,7 @@
           </div>
 
           <el-table
-            :data="permissions"
+            :data="showPermissions"
             border
             style="width: 100%">
             <el-table-column
@@ -97,10 +111,10 @@
               fixed="right"
               label="操作"
               width="100">
-              <template slot-scope="scope">
-                <!-- <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button> -->
-                <el-button type="text" size="small">编辑</el-button>
-              </template>
+<template slot-scope="scope">
+  <!-- <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button> -->
+  <el-button type="text" size="small">编辑</el-button>
+</template>
             </el-table-column>
           </el-table>
           <!-- <br> -->
@@ -127,8 +141,9 @@
         <el-form-item label="权限类型" :label-width="formLabelWidth" prop="type">
           <el-select v-model="permissionForm.type" placeholder="请选择权限类型" style="width:100%;">
             <el-option label="接口" value="1"></el-option>
-            <el-option label="菜单" value="2"></el-option>
-            <el-option label="按钮" value="3"></el-option>
+            <el-option label="页面" value="2"></el-option>
+            <el-option label="菜单" value="3"></el-option>
+            <el-option label="按钮" value="4"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="权限码" :label-width="formLabelWidth" prop="code">
@@ -202,22 +217,52 @@ export default {
       permissionForm: merge({}, permissionForm),
       permissionFormRules: {
         moduleId: [
-          { required: true, message: '请选择所属模块', trigger: 'change' }
+          {
+            required: true,
+            message: '请选择所属模块',
+            trigger: 'change'
+          }
         ],
         name: [
-          { required: true, message: '请输入权限名称', trigger: 'change' }
+          {
+            required: true,
+            message: '请输入权限名称',
+            trigger: 'change'
+          }
         ],
         type: [
-          { required: true, message: '请选择权限类型', trigger: 'change' }
+          {
+            required: true,
+            message: '请选择权限类型',
+            trigger: 'change'
+          }
         ],
-        code: [{ required: true, message: '请输入权限码', trigger: 'change' }]
+        code: [
+          {
+            required: true,
+            message: '请输入权限码',
+            trigger: 'change'
+          }
+        ]
       },
       moduleFormRules: {
-        name: [{ required: true, message: '请输入模块名称', trigger: 'change' }]
+        name: [
+          {
+            required: true,
+            message: '请输入模块名称',
+            trigger: 'change'
+          }
+        ]
       },
+      showPermissions: [],
       permissions: [],
       moduleTree: [],
-      moduleFormModules: [{ id: 0, name: '无' }],
+      moduleFormModules: [
+        {
+          id: 0,
+          name: '无'
+        }
+      ],
       permissionFormModules: [],
       defaultProps: {
         children: 'children',
@@ -229,7 +274,15 @@ export default {
     let res = await api.GetPagePermissionPermissionsParams();
     if (res.code === codes.Success) {
       this.permissions = res.data.permissions;
+      this.showPermissions = res.data.permissions;
       this.permissionFormModules = res.data.modules;
+      this.appendModuleTreeNode({
+        id: 0,
+        name: '所有模块'
+      });
+      this.$refs.moduleTree.setCurrentKey({
+        id: 0  
+      });
       res.data.modules.forEach(element => {
         this.appendModuleTreeNode(element);
         this.moduleFormModules.push(element);
@@ -311,7 +364,7 @@ export default {
       }
     },
     appendModuleTreeNode(element) {
-      if (element.parentId !== 0) {
+      if (element.id !== 0) {
         this.$refs['moduleTree'].append(
           {
             id: element.id,
@@ -327,6 +380,27 @@ export default {
           label: element.name
         });
       }
+    },
+    clickModule(data) {
+      if (data.id === 0) {
+        this.showPermissions = this.permissions;
+      } else {
+        this.showPermissions = [];
+        this.permissions.forEach(element => {
+          let level = this.getModuleLevel(element.moduleId);
+          if (element.moduleId === data.id || level.indexOf(data.id) > -1) {
+            this.showPermissions.push(merge({}, element));
+          }
+        });
+      }
+    },
+    getModuleLevel(moduleId) {
+      for (let i = 0; i < this.moduleFormModules.length; i++) {
+        if (this.moduleFormModules[i].id === moduleId) {
+          return this.moduleFormModules[i].level;
+        }
+      }
+      return '';
     },
     handleDragStart(node, ev) {
       console.log('drag start', node);
@@ -384,6 +458,25 @@ export default {
   // .el-table::before {
   // background-color: #fff;
   // }
+  // tree style
+  .custom-tree-node {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    padding-right: 8px;
+    .el-button--text {
+      color: #409eff;
+      font-size: 12px;
+      display: none;
+    }
+    &:hover {
+      .el-button--text {
+        display: initial;
+      }
+    }
+  }
 }
 </style>
 
