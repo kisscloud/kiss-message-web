@@ -355,7 +355,7 @@ export default {
     },
     async handleCurrentChange(val) {
       this.selectRole = val;
-      let res = await api.GetRolePermissionsAndAccountIds({
+      let res = await api.GetRolePermissionIdsAndAccountIds({
         id: val.id
       });
       if (res.code === codes.Success) {
