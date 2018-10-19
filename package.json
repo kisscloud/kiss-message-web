@@ -84,7 +84,7 @@
     "webpack-bundle-analyzer": "^2.13.1",
     "webpack-cli": "^3.0.1",
     "webpack-dev-server": "^3.1.1",
-    "webpack-merge": "^4.1.2"
+    "webpack-merge": "^4.1.4"
   },
   "dependencies": {
     "axios": "^0.18.0",
@@ -93,6 +93,7 @@
     "core-js": "^2.5.7",
     "element-ui": "^2.4.8",
     "flatpickr": "^4.5.0",
+    "izitoast": "^1.4.0",
     "lodash": "^4.17.10",
     "merge": "^1.2.0",
     "popper.js": "^1.13.0",

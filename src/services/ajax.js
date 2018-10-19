@@ -37,7 +37,11 @@ const setOption = {
 // 全局错误
 const handleError = error => {
   const errMsg = error.message.indexOf('timeout') > -1 ? '请求超时' : '网络错误';
-  alert(errMsg)
+  window.toast.error({
+    message: errMsg,
+    position: 'topRight',
+    class: 'globleToast'
+  });
 }
 
 const handleRequestSuccess = config => {

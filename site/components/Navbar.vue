@@ -55,7 +55,7 @@ export default {
       this.$root.siderOpen = !this.$root.siderOpen;
     },
     logout() {
-      this.$router.push({ path: '/login' });
+      this.$router.push({ path: '/auth/login' });
     }
   }
 };

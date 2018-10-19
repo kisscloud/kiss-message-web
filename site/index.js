@@ -5,11 +5,15 @@ import VueRouter from 'vue-router';
 import Cover from 'cover';
 import routes from './routes';
 import ElementUI from 'element-ui';
+import toast from "izitoast";
+import 'izitoast/dist/css/izitoast.min.css';
 import './styles/global.scss';
 
 Vue.use(ElementUI);
 Vue.use(VueRouter);
 Vue.use(Cover);
+
+window.toast = toast;
 
 const router = new VueRouter({
   mode: 'hash',

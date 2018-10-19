@@ -98,7 +98,7 @@
                 </span>
               </el-tree>
               <br>
-              <el-button v-show="permissionTree.length != 0" size="small" type="primary" @click="savePermissions()">保存权限</el-button>
+              <el-button v-show="permissionTree.length != 0" size="small" type="primary" @click="savePermissions()">绑定权限</el-button>
             </el-tab-pane>
             <el-tab-pane label="分配用户" name="second">
               <el-transfer
@@ -112,7 +112,7 @@
                 :data="accounts">
               </el-transfer>
               <br>
-              <el-button size="small" type="primary" @click="saveAccounts()">保存用户</el-button>
+              <el-button size="small" type="primary" @click="saveAccounts()">绑定用户</el-button>
             </el-tab-pane>
           </el-tabs>
       </el-main>
@@ -149,6 +149,11 @@ import * as api from '../../../src/api';
 import * as codes from '../../../src/codes';
 import merge from 'merge';
 
+var roleForm = {
+  name: null,
+  status: '1'
+};
+
 export default {
   name: 'PersmissionUsers',
   data() {
@@ -162,10 +167,7 @@ export default {
       filterMethod(query, item) {
         return item.label.indexOf(query) > -1;
       },
-      roleForm: {
-        name: null,
-        status: '1'
-      },
+      roleForm: merge({}, roleForm),
       roleFormRules: {
         name: [
           {
@@ -199,7 +201,6 @@ export default {
         this.$refs.roleTable.setCurrentRow(this.roles[0]);
       }
       res.data.accounts.accounts.forEach(element => {
-        console.log(element);
         this.accounts.push({
           label: element.name,
           key: element.id
@@ -230,7 +231,13 @@ export default {
             let res = await api.PutRoles(this.roleForm);
             if (res.code === codes.Success) {
               this.showRoleFormModal = false;
-              // this.roles.push(res.data);
+              for (let i = 0; i < this.roles.length; i++) {
+                if (this.roles[i].id === res.data.id) {
+                  this.roles[i].name = res.data.name;
+                  this.roles[i].status = res.data.status;
+                  break;
+                }
+              }
               this.$message({
                 message: '角色更新成功',
                 type: 'success'

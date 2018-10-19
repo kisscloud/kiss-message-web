@@ -55,11 +55,11 @@
             </el-table-column>
             <el-table-column
               prop="mobile"
-              label="操作前的值">
+              label="输入值">
             </el-table-column>
             <el-table-column
               prop="status"
-              label="操作后的值">
+              label="输出值">
             </el-table-column>
             <!-- <el-table-column
               fixed="right"

@@ -77,6 +77,11 @@ export const PutAccounts = (data, options) => {
   return ajax.put('/kiss-console/service/account', data, options);
 };
 
+// 用户离职
+export const PutAccountDimission = (data, options) => {
+  return ajax.put('/kiss-console/service/account/dimission', data, options);
+};
+
 // 添加权限
 export const PostPermissions = (data, options) => {
   return ajax.post('/kiss-console/service/account/permission', data, options);
@@ -85,6 +90,11 @@ export const PostPermissions = (data, options) => {
 // 添加权限模块
 export const PostPermissionsModules = (data, options) => {
   return ajax.post('/kiss-console/service/account/permission/module', data, options);
+};
+
+// 更新权限模块
+export const PutPermissionsModule = (data, options) => {
+  return ajax.put('/kiss-console/service/account/permission/module', data, options);
 };
 
 // 添加角色

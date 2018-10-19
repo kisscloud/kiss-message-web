@@ -104,7 +104,7 @@
               label="电话">
             </el-table-column>
             <el-table-column
-              prop="status"
+              prop="statusText"
               label="状态">
             </el-table-column>
             <el-table-column
@@ -114,7 +114,8 @@
               <span slot-scope="scope">
                 <!-- <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button> -->
                 <el-button type="text" size="small" @click="openEditAccount(scope.row)">编辑</el-button>
-                <el-button type="text" size="small" @click="clickDimission(scope.row)">离职</el-button>
+                <el-button v-show="scope.row.status === 1" type="text" size="small" @click="clickDimission(scope.row)">离职</el-button>
+                <el-button v-show="scope.row.status === 2" type="text" size="small" @click="clickResume(scope.row)">复职</el-button>
               </span>
             </el-table-column>
           </el-table>
@@ -161,7 +162,7 @@
     </el-dialog>
 
     <el-dialog :title="groupForm.id ? '编辑部门':'添加部门'" :visible.sync="showGroupFormModal">
-      <el-form :model="groupForm" :rules="groupFormRules" ref="groupForm">
+      <el-form :model="groupForm" :rules="groupFormRules" ref="groupForm" :validate-on-rule-change="false">
         <el-form-item label="父部门" :label-width="formLabelWidth">
           <el-select v-model="groupForm.parentId" filterable placeholder="请选择父部门" style="width:100%;">
             <el-option v-for="item in groupFormGroups" v-bind:key="'groupFromGroups'+item.id" :label="item.name" :value="item.id"></el-option>
@@ -219,12 +220,6 @@ var createUserRules = {
       required: true,
       message: '请输入重复密码',
       trigger: 'change'
-    },
-    {
-      min: 8,
-      max: 20,
-      message: '请输入8到20位密码',
-      trigger: 'blur'
     }
   ]
 };
@@ -272,6 +267,16 @@ var updateUserRules = {
   ]
 };
 
+var groupFormRules = {
+  name: [
+    {
+      required: true,
+      message: '请输入部门名称',
+      trigger: 'change'
+    }
+  ]
+};
+
 export default {
   name: 'Persmissionaccounts',
   data() {
@@ -282,15 +287,7 @@ export default {
       userForm: merge({}, userForm),
       groupForm: merge({}, groupForm),
       userFormRules: {},
-      groupFormRules: {
-        name: [
-          {
-            required: true,
-            message: '请输入部门名称',
-            trigger: 'change'
-          }
-        ]
-      },
+      groupFormRules: merge.recursive(true, {}, groupFormRules),
       accounts: [],
       showAccounts: [],
       accountsCount: 0,
@@ -375,7 +372,6 @@ export default {
             }
           }
         } else {
-          console.log('error submit!!');
           return false;
         }
       });
@@ -406,10 +402,32 @@ export default {
               });
               node.data.name = res.data.name;
               node.data.label = res.data.name;
+              if (res.data.parentId !== node.data.parentId) {
+                node.parentId = res.data.parentId;
+                this.$refs.groupTree.remove(node);
+                let parentNode = this.$refs.groupTree.getNode({
+                  id: res.data.parentId
+                });
+                this.$refs.groupTree.append(node, parentNode);
+              }
               this.$message({
                 message: '部门更新成功',
                 type: 'success'
               });
+            } else if (res.code === codes.ValidateError) {
+              for (let i in res.data) {
+                if (typeof this.groupFormRules[i] === 'undefined') {
+                  this.groupFormRules[i] = [];
+                }
+                this.groupFormRules[i].push({
+                  validator: (rule, value, callback) => {
+                    callback(new Error(res.data[i][0]));
+                  },
+                  trigger: 'blur'
+                });
+                this.$refs.groupForm.validateField(i);
+                this.groupFormRules = merge.recursive(true, {}, groupFormRules);
+              }
             } else {
               this.$message({
                 message: res.message,
@@ -435,7 +453,6 @@ export default {
             }
           }
         } else {
-          console.log('error submit!!');
           return false;
         }
       });
@@ -451,6 +468,19 @@ export default {
     openUserFormModal() {
       this.showUserFormModal = true;
       this.userFormRules = merge({}, updateUserRules, createUserRules);
+      this.userFormRules.repeatPassword.push({
+        validator: (rule, value, callback) => {
+          if (value === '') {
+            callback(new Error('请再次输入密码'));
+          } else {
+            if (value !== this.userForm.password) {
+              callback(new Error('两次密码不一致'));
+            }
+            callback();
+          }
+        },
+        trigger: 'blur'
+      });
       this.userForm = merge({}, userForm);
       if (typeof this.$refs.userForm !== 'undefined') {
         this.$refs.userForm.resetFields();
@@ -470,7 +500,37 @@ export default {
         this.$refs.groupForm.resetFields();
       }
     },
-    clickDimission(account) {},
+    clickDimission(account) {
+      let $this = this;
+      this.$confirm(`标注 ${account.name} 为离职状态？`, '提示', {
+        confirmButtonText: '是',
+        cancelButtonText: '否',
+        type: 'warning'
+      }).then(async () => {
+        let res = await api.PutAccountDimission({
+          id: account.id
+        });
+        if (res.code === codes.Success) {
+          for (let i = 0; i < $this.showAccounts.length; i++) {
+            if ($this.showAccounts[i].id === res.data.id) {
+              $this.showAccounts[i].status = res.data.status;
+              $this.showAccounts[i].statusText = res.data.statusText;
+            }
+          }
+          for (let i = 0; i < $this.accounts.length; i++) {
+            if ($this.accounts[i].id === res.data.id) {
+              $this.accounts[i].status = res.data.status;
+              $this.accounts[i].statusText = res.data.statusText;
+            }
+          }
+          this.$message({
+            type: 'success',
+            message: `已标注 ${account.name} 为离职状态`
+          });
+        }
+      });
+    },
+    clickResume(account) {},
     async submitDimission(account) {},
     handleCommand(command) {
       switch (command) {

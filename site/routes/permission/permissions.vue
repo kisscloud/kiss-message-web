@@ -64,7 +64,7 @@
                   <el-button
                     type="text"
                     class="icon-pen5"
-                    @click="openEditGroup(data)"
+                    @click="openPermissionModuleEditModal(data)"
                     size="mini">
                   </el-button>
                 </span>
@@ -281,7 +281,7 @@ export default {
         name: '所有模块'
       });
       this.$refs.moduleTree.setCurrentKey({
-        id: 0  
+        id: 0
       });
       res.data.modules.forEach(element => {
         this.appendModuleTreeNode(element);
@@ -322,23 +322,66 @@ export default {
         if (valid) {
           this.moduleForm.parentId = parseInt(this.moduleForm.parentId);
           this.moduleForm.status = parseInt(this.moduleForm.status);
-          let res = await api.PostPermissionsModules(this.moduleForm);
-          if (res.code === codes.Success) {
-            this.showPermissionModuleFormModal = false;
-            this.permissionFormModules.push(res.data);
-            this.moduleFormModules.push(res.data);
-            this.appendModuleTreeNode(res.data);
-            this.$refs['moduleForm'].resetFields();
-            this.moduleForm = merge({}, moduleForm);
-            this.$message({
-              message: '模块添加成功',
-              type: 'success'
-            });
+          if (this.moduleForm.id) {
+            let res = await api.PutPermissionsModule(this.moduleForm);
+            if (res.code === codes.Success) {
+              this.showPermissionModuleFormModal = false;
+              for (let i = 0; i < this.permissionFormModules.length; i++) {
+                if (this.permissionFormModules[i].id === res.data.id) {
+                  this.permissionFormModules[i] = res.data;
+                  break;
+                }
+              }
+              for (let i = 0; i < this.moduleFormModules.length; i++) {
+                if (this.moduleFormModules[i].id === res.data.id) {
+                  this.moduleFormModules[i] = res.data;
+                  break;
+                }
+              }
+              let node = this.$refs.moduleTree.getNode({
+                id: res.data.id
+              });
+
+              node.data.name = res.data.name;
+              node.data.label = res.data.name;
+              node.data.status = res.data.status;
+
+              if (res.data.parentId !== node.data.parentId) {
+                node.parentId = res.data.parentId;
+                this.$refs.moduleTree.remove(node);
+                let parentNode = this.$refs.moduleTree.getNode({
+                  id: res.data.parentId
+                });
+                this.$refs.moduleTree.append(node, parentNode);
+              }
+
+              this.$message({
+                message: '模块更新成功',
+                type: 'success'
+              });
+            } else {
+              this.$message({
+                message: res.message,
+                type: 'warning'
+              });
+            }
           } else {
-            this.$message({
-              message: res.message,
-              type: 'warning'
-            });
+            let res = await api.PostPermissionsModules(this.moduleForm);
+            if (res.code === codes.Success) {
+              this.showPermissionModuleFormModal = false;
+              this.permissionFormModules.push(res.data);
+              this.moduleFormModules.push(res.data);
+              this.appendModuleTreeNode(res.data);
+              this.$message({
+                message: '模块添加成功',
+                type: 'success'
+              });
+            } else {
+              this.$message({
+                message: res.message,
+                type: 'warning'
+              });
+            }
           }
         } else {
           console.log('error submit!!');
@@ -348,6 +391,18 @@ export default {
     },
     openPermissionModuleFormModal() {
       this.showPermissionModuleFormModal = true;
+      this.moduleForm = merge({}, moduleForm);
+      if (typeof this.$refs.moduleForm !== 'undefined') {
+        this.$refs.moduleForm.resetFields();
+      }
+    },
+    openPermissionModuleEditModal(data) {
+      this.showPermissionModuleFormModal = true;
+      data.status = `${data.status}`;
+      this.moduleForm = merge({}, data);
+      if (typeof this.$refs.moduleForm !== 'undefined') {
+        this.$refs.moduleForm.resetFields();
+      }
     },
     openPermissionFormModal() {
       this.showPermissionFormModal = true;
@@ -368,7 +423,10 @@ export default {
         this.$refs['moduleTree'].append(
           {
             id: element.id,
-            label: element.name
+            label: element.name,
+            name: element.name,
+            parentId: element.parentId,
+            status: element.status
           },
           {
             id: element.parentId
@@ -377,7 +435,10 @@ export default {
       } else {
         this.$refs['moduleTree'].append({
           id: element.id,
-          label: element.name
+          label: element.name,
+          name: element.name,
+          parentId: element.parentId,
+          status: element.status
         });
       }
     },
