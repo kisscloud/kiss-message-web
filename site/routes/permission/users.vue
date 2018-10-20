@@ -63,6 +63,7 @@
                   <span>{{ node.label }}</span>
                   <span>
                     <el-button
+                      v-if="data.id !== 0"
                       type="text"
                       class="icon-pen5"
                       @click="openEditGroup(data)"
@@ -108,14 +109,15 @@
               label="状态">
             </el-table-column>
             <el-table-column
-              fixed="right"
+              align="center"
               label="操作"
-              width="150">
-              <span slot-scope="scope">
+              width="180">
+              <span slot-scope="scope" style="text-align: center;display: block;width: 100%;">
                 <!-- <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button> -->
-                <el-button type="text" size="small" @click="openEditAccount(scope.row)">编辑</el-button>
-                <el-button v-show="scope.row.status === 1" type="text" size="small" @click="clickDimission(scope.row)">离职</el-button>
-                <el-button v-show="scope.row.status === 2" type="text" size="small" @click="clickResume(scope.row)">复职</el-button>
+                <el-button type="text" size="mini" @click="openEditAccount(scope.row)">编辑</el-button>
+                <el-button v-show="scope.row.status === 1" type="text" size="mini" @click="clickDimission(scope.row)">离职</el-button>
+                <el-button v-show="scope.row.status === 2" type="text" size="mini" @click="clickResume(scope.row)">复职</el-button>
+                <el-button type="text" size="mini" @click="clickResetPassword(scope.row)">重置密码</el-button>
               </span>
             </el-table-column>
           </el-table>
@@ -173,6 +175,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
+        <el-button v-show="groupForm.id" @click="deleteGroup(groupForm)" style="float:left;">删除部门</el-button>
         <el-button @click="showGroupFormModal = false">取 消</el-button>
         <el-button type="primary" @click="submitGroupForm()">确 定</el-button>
       </div>
@@ -304,10 +307,15 @@ export default {
   async mounted() {
     let res = await api.GetPagePermissonsAccountsParams();
     if (res.code === codes.Success) {
-      this.accounts = res.data.accounts.accounts;
-      this.showAccounts = res.data.accounts.accounts;
+      res.data.accounts.accounts.forEach(element => {
+        this.accounts.push(merge({}, element));
+        this.showAccounts.push(merge({}, element));
+      });
+      res.data.groups.forEach(element => {
+        this.userFormGroups.push(merge({}, element));
+      });
       this.accountsCount = res.data.accounts.count;
-      this.userFormGroups = res.data.groups;
+
       this.appendGroupTreeNode({
         id: 0,
         name: '所有部门',
@@ -334,13 +342,13 @@ export default {
               this.showUserFormModal = false;
               for (let i = 0; i < this.accounts.length; i++) {
                 if (this.accounts[i].id === res.data.id) {
-                  this.accounts[i] = res.data;
+                  this.accounts[i] = merge(this.accounts[i], res.data);
                   break;
                 }
               }
               for (let i = 0; i < this.showAccounts.length; i++) {
                 if (this.showAccounts[i].id === res.data.id) {
-                  this.showAccounts[i] = res.data;
+                  this.showAccounts[i] = merge(this.showAccounts[i], res.data);
                   break;
                 }
               }
@@ -348,6 +356,21 @@ export default {
                 message: '用户更新成功',
                 type: 'success'
               });
+            } else if (res.code === codes.ValidateError) {
+              let rules = merge.recursive(true, {}, this.userFormRules);
+              for (let i in res.data) {
+                if (typeof this.userFormRules[i] === 'undefined') {
+                  this.userFormRules[i] = [];
+                }
+                this.userFormRules[i].push({
+                  validator: (rule, value, callback) => {
+                    callback(new Error(res.data[i][0]));
+                  },
+                  trigger: 'blur'
+                });
+                this.$refs.userForm.validateField(i);
+              }
+              this.userFormRules = merge.recursive(true, {}, rules);
             } else {
               this.$message({
                 message: res.message,
@@ -364,6 +387,21 @@ export default {
                 message: '用户添加成功',
                 type: 'success'
               });
+            } else if (res.code === codes.ValidateError) {
+              let rules = merge.recursive(true, {}, this.userFormRules);
+              for (let i in res.data) {
+                if (typeof this.userFormRules[i] === 'undefined') {
+                  this.userFormRules[i] = [];
+                }
+                this.userFormRules[i].push({
+                  validator: (rule, value, callback) => {
+                    callback(new Error(res.data[i][0]));
+                  },
+                  trigger: 'blur'
+                });
+                this.$refs.userForm.validateField(i);
+              }
+              this.userFormRules = merge.recursive(true, {}, rules);
             } else {
               this.$message({
                 message: res.message,
@@ -426,8 +464,8 @@ export default {
                   trigger: 'blur'
                 });
                 this.$refs.groupForm.validateField(i);
-                this.groupFormRules = merge.recursive(true, {}, groupFormRules);
               }
+              this.groupFormRules = merge.recursive(true, {}, groupFormRules);
             } else {
               this.$message({
                 message: res.message,
@@ -445,6 +483,20 @@ export default {
                 message: '部门添加成功',
                 type: 'success'
               });
+            } else if (res.code === codes.ValidateError) {
+              for (let i in res.data) {
+                if (typeof this.groupFormRules[i] === 'undefined') {
+                  this.groupFormRules[i] = [];
+                }
+                this.groupFormRules[i].push({
+                  validator: (rule, value, callback) => {
+                    callback(new Error(res.data[i][0]));
+                  },
+                  trigger: 'blur'
+                });
+                this.$refs.groupForm.validateField(i);
+              }
+              this.groupFormRules = merge.recursive(true, {}, groupFormRules);
             } else {
               this.$message({
                 message: res.message,
@@ -459,7 +511,7 @@ export default {
     },
     openEditAccount(account) {
       this.showUserFormModal = true;
-      this.userFormRules = merge({}, updateUserRules);
+      this.userFormRules = merge.recursive(true, {}, updateUserRules);
       this.userForm = merge({}, account);
       if (typeof this.$refs.userForm !== 'undefined') {
         this.$refs.userForm.resetFields();
@@ -467,7 +519,12 @@ export default {
     },
     openUserFormModal() {
       this.showUserFormModal = true;
-      this.userFormRules = merge({}, updateUserRules, createUserRules);
+      this.userFormRules = merge.recursive(
+        true,
+        {},
+        updateUserRules,
+        createUserRules
+      );
       this.userFormRules.repeatPassword.push({
         validator: (rule, value, callback) => {
           if (value === '') {
@@ -502,7 +559,7 @@ export default {
     },
     clickDimission(account) {
       let $this = this;
-      this.$confirm(`标注 ${account.name} 为离职状态？`, '提示', {
+      this.$confirm(`标注 ${account.name} 为离职状态？`, '离职', {
         confirmButtonText: '是',
         cancelButtonText: '否',
         type: 'warning'
@@ -530,8 +587,93 @@ export default {
         }
       });
     },
-    clickResume(account) {},
-    async submitDimission(account) {},
+    clickResume(account) {
+      let $this = this;
+      this.$confirm(`恢复 ${account.name} 为在职状态？`, '复职', {
+        confirmButtonText: '是',
+        cancelButtonText: '否',
+        type: 'warning'
+      }).then(async () => {
+        let res = await api.PutAccountResume({
+          id: account.id
+        });
+        if (res.code === codes.Success) {
+          for (let i = 0; i < $this.showAccounts.length; i++) {
+            if ($this.showAccounts[i].id === res.data.id) {
+              $this.showAccounts[i].status = res.data.status;
+              $this.showAccounts[i].statusText = res.data.statusText;
+            }
+          }
+          for (let i = 0; i < $this.accounts.length; i++) {
+            if ($this.accounts[i].id === res.data.id) {
+              $this.accounts[i].status = res.data.status;
+              $this.accounts[i].statusText = res.data.statusText;
+            }
+          }
+          this.$message({
+            type: 'success',
+            message: `已恢复 ${account.name} 为在职状态`
+          });
+        }
+      });
+    },
+    clickResetPassword(account) {
+      let $this = this;
+      this.$confirm(`重置 ${account.name} 的账户密码？`, '重置密码', {
+        confirmButtonText: '是',
+        cancelButtonText: '否',
+        type: 'warning'
+      }).then(async () => {
+        let res = await api.PutAccountResetPassword(account.id);
+        if (res.code === codes.Success) {
+          this.$message({
+            type: 'success',
+            message: `已重置 ${account.name} 的账户密码`
+          });
+        }
+      });
+    },
+    deleteGroup(group) {
+      let $this = this;
+      this.$confirm(`确定删除 ${group.name} ？`, '删除部门', {
+        confirmButtonText: '是',
+        cancelButtonText: '否',
+        type: 'warning'
+      }).then(async () => {
+        let res = await api.DeleteAccountsGroups(group.id);
+        if (res.code === codes.Success) {
+          this.showGroupFormModal = false;
+          for (let i = 0; i < this.groupFormGroups.length; i++) {
+            if (this.groupFormGroups[i].id === group.id) {
+              this.groupFormGroups.splice(i, 1);
+              break;
+            }
+          }
+          for (let i = 0; i < this.userFormGroups.length; i++) {
+            if (this.userFormGroups[i].id === group.id) {
+              this.userFormGroups.splice(i, 1);
+              break;
+            }
+          }
+          this.$refs.groupTree.remove({
+            id: group.id
+          });
+          this.$refs.groupTree.setCurrentKey({
+            id: 0
+          });
+          this.clickModule({ id: 0 });
+          this.$message({
+            type: 'success',
+            message: `已删除 ${group.name}`
+          });
+        } else {
+          this.$message({
+            type: 'warning',
+            message: res.message
+          });
+        }
+      });
+    },
     handleCommand(command) {
       switch (command) {
         case 'group':

@@ -82,18 +82,18 @@
                       size="mini">
                       {{ data.type }}
                     </el-button>
-                    <el-button
+                    <!-- <el-button
                       type="text"
                       class="option-type"
                       size="mini">
                       {{ data.code ? '权限' : '模块' }}
-                    </el-button>
-                    <!-- <el-button
+                    </el-button> -->
+                    <el-button
                       type="text"
                       class="permission-description"
                       size="mini">
                       {{ data.description || '-' }}
-                    </el-button> -->
+                    </el-button>
                   </span>
                 </span>
               </el-tree>
@@ -118,8 +118,8 @@
       </el-main>
     </el-container>
 
-    <el-dialog title="添加角色" :visible.sync="showRoleFormModal">
-      <el-form :model="roleForm" :rules="roleFormRules" ref="roleForm">
+    <el-dialog :title="roleForm.id? '编辑据说': '添加角色'" :visible.sync="showRoleFormModal">
+      <el-form :model="roleForm" :rules="roleFormRules" ref="roleForm" :validate-on-rule-change="false">
         <!-- <el-form-item label="父部门" label-width="80px">
           <el-select v-model="form2.region" placeholder="请选择活动区域">
             <el-option label="区域一" value="shanghai"></el-option>
@@ -137,8 +137,9 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
+        <el-button v-show="roleForm.id" @click="deleteRole(roleForm)" style="float:left;">删除角色</el-button>
         <el-button @click="showRoleFormModal = false">取 消</el-button>
-        <el-button type="primary" @click="submitRoleForm()">确 定</el-button>
+        <el-button type="primary" @click="submitRoleForm()">{{ roleForm.id? '保存': '添加' }}</el-button>
       </div>
     </el-dialog>    
   </c-main>
@@ -193,6 +194,14 @@ export default {
       this.selectPermissions = res.data.firstRolePermissions;
       this.selectAccounts = res.data.firstRoleAccounts;
 
+      if (res.data.modules.length > 0) {
+        this.appendPermissionTreeNode({
+          id: 0,
+          name: '全部权限',
+          code: '权限码',
+          description: '描述'
+        });
+      }
       res.data.modules.forEach(element => {
         this.appendPermissionTreeNode(element);
       });
@@ -225,9 +234,8 @@ export default {
     submitRoleForm() {
       this.$refs['roleForm'].validate(async valid => {
         if (valid) {
-          this.roleForm.status = parseInt(this.roleForm.status);
-
           if (this.roleForm.id) {
+            this.roleForm.status = parseInt(this.roleForm.status);
             let res = await api.PutRoles(this.roleForm);
             if (res.code === codes.Success) {
               this.showRoleFormModal = false;
@@ -242,6 +250,22 @@ export default {
                 message: '角色更新成功',
                 type: 'success'
               });
+            } else if (res.code === codes.ValidateError) {
+              this.roleForm.status = `${this.roleForm.status}`;
+              let rules = merge.recursive(true, {}, this.roleFormRules);
+              for (let i in res.data) {
+                if (typeof this.roleFormRules[i] === 'undefined') {
+                  this.roleFormRules[i] = [];
+                }
+                this.roleFormRules[i].push({
+                  validator: (rule, value, callback) => {
+                    callback(new Error(res.data[i][0]));
+                  },
+                  trigger: 'blur'
+                });
+                this.$refs.roleForm.validateField(i);
+              }
+              this.roleFormRules = merge.recursive(true, {}, rules);
             } else {
               this.$message({
                 message: res.message,
@@ -257,6 +281,22 @@ export default {
                 message: '角色添加成功',
                 type: 'success'
               });
+            } else if (res.code === codes.ValidateError) {
+              this.roleForm.status = `${this.roleForm.status}`;
+              let rules = merge.recursive(true, {}, this.roleFormRules);
+              for (let i in res.data) {
+                if (typeof this.roleFormRules[i] === 'undefined') {
+                  this.roleFormRules[i] = [];
+                }
+                this.roleFormRules[i].push({
+                  validator: (rule, value, callback) => {
+                    callback(new Error(res.data[i][0]));
+                  },
+                  trigger: 'blur'
+                });
+                this.$refs.roleForm.validateField(i);
+              }
+              this.roleFormRules = merge.recursive(true, {}, rules);
             } else {
               this.$message({
                 message: res.message,
@@ -289,7 +329,7 @@ export default {
       console.log(tab, event);
     },
     appendPermissionTreeNode(element) {
-      if (element.parentId !== 0) {
+      if (element.id !== 0) {
         this.$refs['permissionTree'].append(
           {
             id: 'module' + element.id,
@@ -302,7 +342,9 @@ export default {
       } else {
         this.$refs['permissionTree'].append({
           id: 'module' + element.id,
-          label: element.name
+          label: element.name,
+          code: element.code,
+          description: element.description
         });
       }
     },
@@ -376,6 +418,29 @@ export default {
           type: 'warning'
         });
       }
+    },
+    deleteRole(role) {
+      let $this = this;
+      this.$confirm(`删除 ${role.name} ？`, '删除角色', {
+        confirmButtonText: '是',
+        cancelButtonText: '否',
+        type: 'warning'
+      }).then(async () => {
+        let res = await api.DeleteRole(role.id);
+        if (res.code === codes.Success) {
+          for (let i = 0; i < this.roles.length; i++) {
+            if (this.roles[i].id === role.id) {
+              this.roles.splice(i, 1);
+              break;
+            }
+          }
+          this.showRoleFormModal = false;
+          this.$message({
+            type: 'success',
+            message: `已删除 ${role.name}`
+          });
+        }
+      });
     },
     handleDragStart(node, ev) {
       console.log('drag start', node);
@@ -479,7 +544,7 @@ export default {
     text-align: left;
   }
   .permission-description {
-    min-width: 200px;
+    min-width: 100px;
     text-align: left;
   }
 }

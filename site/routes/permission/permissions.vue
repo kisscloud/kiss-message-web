@@ -63,6 +63,7 @@
                 <span>
                   <el-button
                     type="text"
+                    v-if="data.id !== 0"
                     class="icon-pen5"
                     @click="openPermissionModuleEditModal(data)"
                     size="mini">
@@ -108,13 +109,13 @@
               label="状态">
             </el-table-column>
             <el-table-column
-              fixed="right"
+              align="center"
               label="操作"
               width="100">
-<template slot-scope="scope">
-  <!-- <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button> -->
-  <el-button type="text" size="small">编辑</el-button>
-</template>
+              <span slot-scope="scope" style="width:100%;">
+                <el-button type="text" @click="openPermissionEditModal(scope.row)" size="small">编辑</el-button>
+                <el-button @click="deletePermission(scope.row)" type="text" size="small">删除</el-button>
+              </span>
             </el-table-column>
           </el-table>
           <!-- <br> -->
@@ -129,7 +130,7 @@
     </el-container>
 
     <el-dialog title="添加权限" :visible.sync="showPermissionFormModal">
-      <el-form :model="permissionForm" :rules="permissionFormRules" ref="permissionForm">
+      <el-form :model="permissionForm" :rules="permissionFormRules" ref="permissionForm" :validate-on-rule-change="false">
         <el-form-item label="所属模块" :label-width="formLabelWidth" prop="moduleId">
           <el-select v-model="permissionForm.moduleId" placeholder="请选择权限模块" style="width:100%;">
             <el-option v-for="item in permissionFormModules" v-bind:key="'permissionForm_'+item.id" :label="item.name" :value="item.id"></el-option>
@@ -163,7 +164,7 @@
     </el-dialog>
 
     <el-dialog title="添加权限模块" :visible.sync="showPermissionModuleFormModal">
-      <el-form :model="moduleForm" :rules="moduleFormRules" ref="moduleForm">
+      <el-form :model="moduleForm" :rules="moduleFormRules" ref="moduleForm" :validate-on-rule-change="false">
         <el-form-item label="父模块" :label-width="formLabelWidth">
           <el-select v-model="moduleForm.parentId" placeholder="请选择父模块" style="width:100%;">
             <el-option v-for="item in moduleFormModules" v-bind:key="'moduleForm_'+item.id" :label="item.name" :value="item.id"></el-option>
@@ -180,6 +181,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
+        <el-button @click="deleteModule(moduleForm)" style="float:left;">删除模块</el-button>
         <el-button @click="showPermissionModuleFormModal = false">取 消</el-button>
         <el-button type="primary" @click="submitModuleForm()">确 定</el-button>
       </div>
@@ -293,23 +295,74 @@ export default {
     submitPermissionForm() {
       this.$refs['permissionForm'].validate(async valid => {
         if (valid) {
-          this.permissionForm.moduleId = parseInt(this.permissionForm.moduleId);
-          this.permissionForm.status = parseInt(this.permissionForm.status);
-          let res = await api.PostPermissions(this.permissionForm);
-          if (res.code === codes.Success) {
-            this.showPermissionFormModal = false;
-            this.permissions.push(res.data);
-            this.$refs['permissionForm'].resetFields();
-            this.permissionForm = merge({}, permissionForm);
-            this.$message({
-              message: '权限添加成功',
-              type: 'success'
-            });
+          let data = merge({}, this.permissionForm);
+          data.moduleId = parseInt(this.permissionForm.moduleId);
+          data.status = parseInt(this.permissionForm.status);
+          if (data.id) {
+            let res = await api.PutPermission(data);
+            if (res.code === codes.Success) {
+              this.showPermissionFormModal = false;
+              for (let i = 0; i < this.permissions.length; i++) {
+                if (this.permissions[i].id === res.data.id) {
+                  this.permissions[i] = merge(this.permissions[i], res.data);
+                  break;
+                }
+              }
+              this.$message({
+                message: '权限更新成功',
+                type: 'success'
+              });
+            } else if (res.code === codes.ValidateError) {
+              let rules = merge.recursive(true, {}, this.permissionFormRules);
+              for (let i in res.data) {
+                if (typeof this.permissionFormRules[i] === 'undefined') {
+                  this.permissionFormRules[i] = [];
+                }
+                this.permissionFormRules[i].push({
+                  validator: (rule, value, callback) => {
+                    callback(new Error(res.data[i][0]));
+                  },
+                  trigger: 'blur'
+                });
+                this.$refs.permissionForm.validateField(i);
+              }
+              this.permissionFormRules = merge.recursive(true, {}, rules);
+            } else {
+              this.$message({
+                message: res.message,
+                type: 'warning'
+              });
+            }
           } else {
-            this.$message({
-              message: res.message,
-              type: 'warning'
-            });
+            let res = await api.PostPermissions(data);
+            if (res.code === codes.Success) {
+              this.showPermissionFormModal = false;
+              this.permissions.push(res.data);
+              this.$message({
+                message: '权限添加成功',
+                type: 'success'
+              });
+            } else if (res.code === codes.ValidateError) {
+              let rules = merge.recursive(true, {}, this.permissionFormRules);
+              for (let i in res.data) {
+                if (typeof this.permissionFormRules[i] === 'undefined') {
+                  this.permissionFormRules[i] = [];
+                }
+                this.permissionFormRules[i].push({
+                  validator: (rule, value, callback) => {
+                    callback(new Error(res.data[i][0]));
+                  },
+                  trigger: 'blur'
+                });
+                this.$refs.permissionForm.validateField(i);
+              }
+              this.permissionFormRules = merge.recursive(true, {}, rules);
+            } else {
+              this.$message({
+                message: res.message,
+                type: 'warning'
+              });
+            }
           }
         } else {
           console.log('error submit!!');
@@ -320,10 +373,11 @@ export default {
     submitModuleForm() {
       this.$refs['moduleForm'].validate(async valid => {
         if (valid) {
-          this.moduleForm.parentId = parseInt(this.moduleForm.parentId);
-          this.moduleForm.status = parseInt(this.moduleForm.status);
+          let data = merge({}, this.moduleForm);
+          data.parentId = parseInt(this.moduleForm.parentId);
+          data.status = parseInt(this.moduleForm.status);
           if (this.moduleForm.id) {
-            let res = await api.PutPermissionsModule(this.moduleForm);
+            let res = await api.PutPermissionsModule(data);
             if (res.code === codes.Success) {
               this.showPermissionModuleFormModal = false;
               for (let i = 0; i < this.permissionFormModules.length; i++) {
@@ -359,6 +413,21 @@ export default {
                 message: '模块更新成功',
                 type: 'success'
               });
+            } else if (res.code === codes.ValidateError) {
+              let rules = merge.recursive(true, {}, this.moduleFormRules);
+              for (let i in res.data) {
+                if (typeof this.moduleFormRules[i] === 'undefined') {
+                  this.moduleFormRules[i] = [];
+                }
+                this.moduleFormRules[i].push({
+                  validator: (rule, value, callback) => {
+                    callback(new Error(res.data[i][0]));
+                  },
+                  trigger: 'blur'
+                });
+                this.$refs.moduleForm.validateField(i);
+              }
+              this.moduleFormRules = merge.recursive(true, {}, rules);
             } else {
               this.$message({
                 message: res.message,
@@ -376,6 +445,21 @@ export default {
                 message: '模块添加成功',
                 type: 'success'
               });
+            } else if (res.code === codes.ValidateError) {
+              let rules = merge.recursive(true, {}, this.moduleFormRules);
+              for (let i in res.data) {
+                if (typeof this.moduleFormRules[i] === 'undefined') {
+                  this.moduleFormRules[i] = [];
+                }
+                this.moduleFormRules[i].push({
+                  validator: (rule, value, callback) => {
+                    callback(new Error(res.data[i][0]));
+                  },
+                  trigger: 'blur'
+                });
+                this.$refs.moduleForm.validateField(i);
+              }
+              this.moduleFormRules = merge.recursive(true, {}, rules);
             } else {
               this.$message({
                 message: res.message,
@@ -406,6 +490,92 @@ export default {
     },
     openPermissionFormModal() {
       this.showPermissionFormModal = true;
+      this.permissionForm = merge({}, permissionForm);
+      if (typeof this.$refs.permissionForm !== 'undefined') {
+        this.$refs.permissionForm.resetFields();
+      }
+    },
+    openPermissionEditModal(data) {
+      this.showPermissionFormModal = true;
+      data.status = `${data.status}`;
+      data.type = `${data.type}`;
+      this.permissionForm = merge({}, data);
+      if (typeof this.$refs.permissionForm !== 'undefined') {
+        this.$refs.permissionForm.resetFields();
+      }
+    },
+    deletePermission(permission) {
+      let $this = this;
+      this.$confirm(`删除 ${permission.name} ？`, '删除权限', {
+        confirmButtonText: '是',
+        cancelButtonText: '否',
+        type: 'warning'
+      }).then(async () => {
+        let res = await api.DeletePermission(permission.id);
+        if (res.code === codes.Success) {
+          for (let i = 0; i < this.permissions.length; i++) {
+            if (this.permissions[i].id === permission.id) {
+              this.permissions.splice(i, 1);
+              break;
+            }
+          }
+          for (let i = 0; i < this.showPermissions.length; i++) {
+            if (this.showPermissions[i].id === permission.id) {
+              this.showPermissions.splice(i, 1);
+              break;
+            }
+          }
+          this.showRoleFormModal = false;
+          this.$message({
+            type: 'success',
+            message: `已删除 ${permission.name}`
+          });
+        }
+      });
+    },
+    deleteModule(module) {
+      let $this = this;
+      this.$confirm(`删除 ${module.name} ？`, '删除权限模块', {
+        confirmButtonText: '是',
+        cancelButtonText: '否',
+        type: 'warning'
+      }).then(async () => {
+        let res = await api.DeletePermissionModule(module.id);
+        if (res.code === codes.Success) {
+          for (let i = 0; i < this.permissionFormModules.length; i++) {
+            if (this.permissionFormModules[i].id === module.id) {
+              this.permissionFormModules.splice(i, 1);
+              break;
+            }
+          }
+          for (let i = 0; i < this.permissions.length; i++) {
+            if (this.permissions[i].id === module.id) {
+              this.permissions.splice(i, 1);
+              break;
+            }
+          }
+          for (let i = 0; i < this.showPermissions.length; i++) {
+            if (this.showPermissions[i].id === module.id) {
+              this.showPermissions.splice(i, 1);
+              break;
+            }
+          }
+          this.$refs.moduleTree.remove({
+            id: module.id
+          });
+
+          this.showPermissionModuleFormModal = false;
+          this.$message({
+            type: 'success',
+            message: `已删除 ${module.name}`
+          });
+        } else {
+          this.$message({
+            type: 'warning',
+            message: res.message
+          });
+        }
+      });
     },
     handleCommand(command) {
       switch (command) {

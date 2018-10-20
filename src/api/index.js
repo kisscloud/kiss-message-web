@@ -67,6 +67,10 @@ export const PutAccountsGroups = (data, options) => {
   return ajax.put('/kiss-console/service/account/group', data, options);
 };
 
+export const DeleteAccountsGroups = (groupId, options) => {
+  return ajax.delete(`/kiss-console/service/account/group?id=${groupId}`, options);
+};
+
 // 添加用户
 export const PostAccounts = (data, options) => {
   return ajax.post('/kiss-console/service/account', data, options);
@@ -82,9 +86,27 @@ export const PutAccountDimission = (data, options) => {
   return ajax.put('/kiss-console/service/account/dimission', data, options);
 };
 
+// 用户复职
+export const PutAccountResume = (data, options) => {
+  return ajax.put('/kiss-console/service/account/resume', data, options);
+};
+
+// 用户重置密码
+export const PutAccountResetPassword = (accountId, data, options) => {
+  return ajax.put(`/kiss-console/service/account/reset/password?id=${accountId}`, data, options);
+};
+
 // 添加权限
 export const PostPermissions = (data, options) => {
   return ajax.post('/kiss-console/service/account/permission', data, options);
+};
+
+export const PutPermission = (data, options) => {
+  return ajax.put(`/kiss-console/service/account/permission?id=${data.id}`, data, options);
+};
+
+export const DeletePermission = (id, options) => {
+  return ajax.delete(`/kiss-console/service/account/permission?id=${id}`, options);
 };
 
 // 添加权限模块
@@ -97,6 +119,11 @@ export const PutPermissionsModule = (data, options) => {
   return ajax.put('/kiss-console/service/account/permission/module', data, options);
 };
 
+// 删除权限模块
+export const DeletePermissionModule = (id, options) => {
+  return ajax.delete(`/kiss-console/service/account/permission/module?id=${id}`, options);
+};
+
 // 添加角色
 export const PostRoles = (data, options) => {
   return ajax.post('/kiss-console/service/account/role', data, options);
@@ -104,7 +131,12 @@ export const PostRoles = (data, options) => {
 
 // 编辑角色
 export const PutRoles = (data, options) => {
-  return ajax.put('/kiss-console/service/account/role', data, options);
+  return ajax.put(`/kiss-console/service/account/role?id=${data.id}`, data, options);
+};
+
+// 删除角色
+export const DeleteRole = (id, options) => {
+  return ajax.delete(`/kiss-console/service/account/role?id=${id}`, options);
 };
 
 // 获取角色绑定的账户和权限
