@@ -105,6 +105,10 @@
               label="权限码">
             </el-table-column>
             <el-table-column
+              prop="limitFields"
+              label="权限描述">
+            </el-table-column>
+            <el-table-column
               prop="statusText"
               label="状态">
             </el-table-column>
@@ -149,6 +153,14 @@
         </el-form-item>
         <el-form-item label="权限码" :label-width="formLabelWidth" prop="code">
           <el-input v-model="permissionForm.code" autocomplete="off"></el-input>
+        </el-form-item>
+         <el-form-item label="权限描述" :label-width="formLabelWidth">
+          <el-input
+            type="textarea"
+            :rows="2"
+            placeholder="请输入权限描述，用于绑定权限时提示使用"
+            v-model="permissionForm.limitFields">
+          </el-input>
         </el-form-item>
         <el-form-item label="权限状态" :label-width="formLabelWidth">
           <el-radio-group v-model="permissionForm.status">
@@ -205,7 +217,8 @@ var permissionForm = {
   name: null,
   type: '1',
   code: null,
-  status: '1'
+  status: '1',
+  limitFields: ''
 };
 
 export default {

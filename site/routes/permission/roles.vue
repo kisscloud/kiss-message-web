@@ -57,7 +57,7 @@
 
       <!-- 用户列表 -->
       <el-main>
-          <el-tabs type="border-card" v-model="tabActiveName" @tab-click="handleClick">
+          <el-tabs type="border-card" v-model="tabActiveName">
             <el-tab-pane label="分配权限" name="first">
               <el-tree
                 :data="permissionTree"
@@ -66,6 +66,7 @@
                 node-key="id"
                 :default-expand-all="true"
                 :default-checked-keys="selectPermissions"
+                @check-change="openRolePermissionModal"
                 :props="defaultProps">
                 <span class="custom-tree-node" slot-scope="{ node, data }">
                   <span>{{ node.label }}</span>
@@ -118,7 +119,7 @@
       </el-main>
     </el-container>
 
-    <el-dialog :title="roleForm.id? '编辑据说': '添加角色'" :visible.sync="showRoleFormModal">
+    <el-dialog :title="roleForm.id? '编辑角色': '添加角色'" :visible.sync="showRoleFormModal">
       <el-form :model="roleForm" :rules="roleFormRules" ref="roleForm" :validate-on-rule-change="false">
         <!-- <el-form-item label="父部门" label-width="80px">
           <el-select v-model="form2.region" placeholder="请选择活动区域">
@@ -141,7 +142,33 @@
         <el-button @click="showRoleFormModal = false">取 消</el-button>
         <el-button type="primary" @click="submitRoleForm()">{{ roleForm.id? '保存': '添加' }}</el-button>
       </div>
-    </el-dialog>    
+    </el-dialog>
+
+      <el-dialog title="配置角色权限" :visible.sync="showRolePermissionModal">
+      <el-form :model="rolePermissionForm" ref="rolePermissionForm" :validate-on-rule-change="false">      
+        <el-form-item label="权限名称" label-width="120px" prop="name">
+          <el-input :disabled="true" v-model="rolePermissionForm.name" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="角色权限码" label-width="120px">
+          <el-input placeholder="输入数据限制参数" v-model="rolePermissionForm.limitData">
+          <span slot="prepend">{{ rolePermissionForm.code }}?</span>
+          </el-input>
+          <p class="limit-fields">{{ rolePermissionForm.limitFields }}</p>
+        </el-form-item>
+        <el-form-item label="角色权限描述" label-width="120px">
+          <el-input
+            type="textarea"
+            :rows="2"
+            placeholder="输入角色权限描述"
+            v-model="rolePermissionForm.limitDescription">
+          </el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="showRolePermissionModal = false">取 消</el-button>
+        <el-button type="primary" @click="submitRoleForm()">保存</el-button>
+      </div>
+    </el-dialog> 
   </c-main>
 </template>
 
@@ -160,6 +187,7 @@ export default {
   data() {
     return {
       showRoleFormModal: false,
+      showRolePermissionModal: false,
       tabActiveName: 'first',
       selectRole: {},
       selectPermissions: [],
@@ -169,6 +197,7 @@ export default {
         return item.label.indexOf(query) > -1;
       },
       roleForm: merge({}, roleForm),
+      rolePermissionForm: {},
       roleFormRules: {
         name: [
           {
@@ -221,7 +250,7 @@ export default {
             id: element.id,
             label: element.name,
             code: element.code,
-            description: element.description
+            limitFields: element.limitFields
           },
           {
             id: 'module' + element.moduleId
@@ -325,8 +354,15 @@ export default {
       this.roleForm = merge({}, data);
       this.roleForm.status = `${data.status}`;
     },
-    handleClick(tab, event) {
-      console.log(tab, event);
+    openRolePermissionModal(data, checked) {
+      console.log(data)
+      if (checked) {
+        this.showRolePermissionModal = true;
+        this.rolePermissionForm.name = data.label;
+        this.rolePermissionForm.code = data.code;
+        this.rolePermissionForm.limitFields = data.limitFields;
+        this.rolePermissionForm.limitDescription = '';
+      }
     },
     appendPermissionTreeNode(element) {
       if (element.id !== 0) {
@@ -546,6 +582,13 @@ export default {
   .permission-description {
     min-width: 100px;
     text-align: left;
+  }
+
+  // form style
+  .limit-fields {
+    margin-bottom: -16px;
+    font-size: 12px;
+    color: #909090;
   }
 }
 </style>
