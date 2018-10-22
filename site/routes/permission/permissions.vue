@@ -147,8 +147,7 @@
           <el-select v-model="permissionForm.type" placeholder="请选择权限类型" style="width:100%;">
             <el-option label="接口" value="1"></el-option>
             <el-option label="页面" value="2"></el-option>
-            <el-option label="菜单" value="3"></el-option>
-            <el-option label="按钮" value="4"></el-option>
+            <el-option label="组件" value="3"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="权限码" :label-width="formLabelWidth" prop="code">
@@ -230,6 +229,7 @@ export default {
       formLabelWidth: '80px',
       moduleForm: merge({}, moduleForm),
       permissionForm: merge({}, permissionForm),
+      selectModule: {},
       permissionFormRules: {
         moduleId: [
           {
@@ -492,6 +492,7 @@ export default {
       if (typeof this.$refs.moduleForm !== 'undefined') {
         this.$refs.moduleForm.resetFields();
       }
+      this.moduleForm.parentId = this.selectModule.id;
     },
     openPermissionModuleEditModal(data) {
       this.showPermissionModuleFormModal = true;
@@ -507,6 +508,7 @@ export default {
       if (typeof this.$refs.permissionForm !== 'undefined') {
         this.$refs.permissionForm.resetFields();
       }
+      this.permissionForm.moduleId = this.selectModule.id;
     },
     openPermissionEditModal(data) {
       this.showPermissionFormModal = true;
@@ -626,6 +628,7 @@ export default {
       }
     },
     clickModule(data) {
+      this.selectModule = data;
       if (data.id === 0) {
         this.showPermissions = this.permissions;
       } else {

@@ -74,8 +74,12 @@
                     <el-button
                       type="text"
                       class="option-type"
-                      size="mini">
-                      {{ data.id === 'module0' ? '类型' : (data.code ? '权限' : '模块') }}
+                      size="mini">                    
+                      <if v-if="data.id === 'module0'">权限类型</if>
+                      <if v-if="data.type === 1">接口</if>
+                      <if v-if="data.type === 2">页面</if>
+                      <if v-if="data.type === 3">组件</if>
+                      <if v-if="data.id !== 'module0' && !data.code">-</if>
                     </el-button>
                     <el-button
                       type="text"
@@ -189,6 +193,7 @@ export default {
       selectRole: {},
       selectPermissions: [],
       editRolePermissions: [],
+      permissions: [],
       accounts: [],
       selectAccounts: [],
       filterMethod(query, item) {
@@ -217,45 +222,14 @@ export default {
     let res = await api.GetPagePermissionRolesParams();
 
     if (res.code === codes.Success) {
-      this.roles = res.data.roles;
-      this.selectPermissions = res.data.firstRolePermissions;
-      this.selectAccounts = res.data.firstRoleAccounts;
+      this.roles = res.data.roles || [];
+      this.selectPermissions = res.data.firstRolePermissions || [];
+      this.selectAccounts = res.data.firstRoleAccounts || [];
       this.couldShowRolePermissionModal = true;
-      if (res.data.modules.length > 0) {
-        this.appendPermissionTreeNode({
-          id: 0,
-          name: '全部权限'
-        });
-      }
-      res.data.modules.forEach(element => {
-        this.appendPermissionTreeNode(element);
-      });
-      if (this.roles.length > 0) {
-        this.selectRole = this.roles[0];
-        this.$refs.roleTable.setCurrentRow(this.roles[0]);
-      }
-      res.data.accounts.accounts.forEach(element => {
-        this.accounts.push({
-          label: element.name,
-          key: element.id
-        });
-      });
-      res.data.permissions.forEach(element => {
-        this.$refs.permissionTree.append(
-          {
-            id: element.id,
-            type: 'permission',
-            label: element.name,
-            code: element.code,
-            limitFields: element.limitFields,
-            limitString: '',
-            limitDescription: ''
-          },
-          {
-            id: 'module' + element.moduleId
-          }
-        );
-      });
+      this.modules = res.data.modules || [];
+      this.allAccounts = res.data.accounts.accounts || [];
+      this.permissions = res.data.permissions || [];
+      this.generatePermissionTree();
     }
   },
   methods: {
@@ -338,6 +312,43 @@ export default {
         }
       });
     },
+    generatePermissionTree() {
+      if (this.modules.length > 0) {
+        this.appendPermissionTreeNode({
+          id: 0,
+          name: '全部权限'
+        });
+      }
+      this.modules.forEach(element => {
+        this.appendPermissionTreeNode(element);
+      });
+      if (this.roles.length > 0) {
+        this.selectRole = this.roles[0];
+        this.$refs.roleTable.setCurrentRow(this.roles[0]);
+      }
+      this.allAccounts.forEach(element => {
+        this.accounts.push({
+          label: element.name,
+          key: element.id
+        });
+      });
+      this.permissions.forEach(element => {
+        this.$refs.permissionTree.append(
+          {
+            id: element.id,
+            type: element.type,
+            label: element.name,
+            code: element.code,
+            limitFields: element.limitFields,
+            limitString: '',
+            limitDescription: ''
+          },
+          {
+            id: 'module' + element.moduleId
+          }
+        );
+      });
+    },
     openRoleFormModal() {
       this.showRoleFormModal = true;
       this.roleForm = merge({}, roleForm);
@@ -409,7 +420,7 @@ export default {
       let permissions = [];
       this.$refs['permissionTree'].getCheckedNodes().forEach(element => {
         if (typeof element.code !== 'undefined' && element.code) {
-          console.log(element)
+          console.log(element);
           permissions.push({
             permissionId: element.id,
             limitString: element.limitString,
@@ -466,6 +477,16 @@ export default {
     },
     async handleCurrentChange(val) {
       this.selectRole = val;
+      for(let i =0;i<this.permissions.length;i++){
+        let node = this.$refs.permissionTree.getNode({
+          id: this.permissions[i].id
+        })
+        if(node){
+          console.log(node)
+          node.data.limitString = "";
+          node.data.limitDescription = "";
+        }
+      }
       let res = await api.GetRolePermissionIdsAndAccountIds({
         id: val.id
       });
@@ -621,7 +642,7 @@ export default {
   .option-type {
     position: relative;
     top: 1px;
-    width: 50px;
+    width: 80px;
   }
   .permission-code {
     min-width: 200px;
