@@ -110,7 +110,7 @@
                 :filter-method="filterMethod"
                 filter-placeholder="输入用户名"
                 :titles="['未分配用户', '已分配用户']"
-                :button-texts="['移除','分配']"
+                :button-texts="['移除 >','< 分配']"
                 v-model="selectAccounts"
                 :data="accounts">
               </el-transfer>
@@ -146,7 +146,7 @@
       </div>
     </el-dialog>
 
-      <el-dialog title="配置角色权限" :visible.sync="showRolePermissionModal">
+    <el-dialog title="配置角色权限" :visible.sync="showRolePermissionModal" :close-on-click-modal="false" :close-on-press-escape="false" :show-close="false">
       <el-form :model="rolePermissionForm" ref="rolePermissionForm" :validate-on-rule-change="false">      
         <el-form-item label="权限名称" label-width="120px" prop="name">
           <el-input :disabled="true" v-model="rolePermissionForm.name" autocomplete="off"></el-input>
@@ -178,8 +178,8 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="showRolePermissionModal = false">取 消</el-button>
-        <el-button type="primary" @click="addRolePermission(rolePermissionForm)">保存</el-button>
+        <el-button @click="cancelRolePermission(rolePermissionForm)">取消</el-button>
+        <el-button type="primary" @click="addRolePermission(rolePermissionForm)">绑定</el-button>
       </div>
     </el-dialog> 
   </c-main>
@@ -409,8 +409,21 @@ export default {
       let node = this.$refs.permissionTree.getNode({
         id: this.rolePermissionForm.id
       });
-      node.data.limitString = this.rolePermissionForm.limitString;
+      if(this.rolePermissionForm.limitString){
+        node.data.limitString =this.rolePermissionForm.code +'?' + this.rolePermissionForm.limitString;
+      }else{
+        node.data.limitString =this.rolePermissionForm.code
+      }
       node.data.limitDescription = this.rolePermissionForm.limitDescription;
+      this.showRolePermissionModal = false;
+    },
+    cancelRolePermission(data) {
+      this.$refs.permissionTree.setChecked(
+        {
+          id: data.id
+        },
+        false
+      );
       this.showRolePermissionModal = false;
     },
     appendPermissionTreeNode(element) {
@@ -438,10 +451,9 @@ export default {
       let permissions = [];
       this.$refs['permissionTree'].getCheckedNodes().forEach(element => {
         if (typeof element.code !== 'undefined' && element.code) {
-          console.log(element);
           permissions.push({
             permissionId: element.id,
-            limitString: element.limitString,
+            limitString:  element.limitString,
             limitDescription: element.limitDescription
           });
         }
@@ -660,10 +672,10 @@ export default {
   .option-type {
     position: relative;
     top: 1px;
-    width: 80px;
+    width: 40px;
   }
   .permission-code {
-    width: 500px;
+    width: 350px;
     text-align: left;
     overflow: hidden;
   }
@@ -680,6 +692,31 @@ export default {
   }
   .el-input.is-disabled .el-input__inner {
     color: #777777;
+  }
+
+  // transfer
+  .el-transfer-panel:first-child {
+    position: absolute;
+    right: 15px;
+  }
+  .el-transfer__buttons {
+    position: absolute;
+    right: calc(50% - 54px);
+    top: 30%;
+  }
+  .el-transfer__button:first-child {
+    position: absolute;
+  }
+  .el-transfer__button:last-child {
+    margin-top: 50px;
+  }
+  .el-icon-arrow-left:before,
+  .el-icon-arrow-right:before {
+    display: none;
+  }
+  .el-transfer-panel__body,
+  .el-transfer-panel__list.is-filterable {
+    height: 400px;
   }
 }
 </style>
