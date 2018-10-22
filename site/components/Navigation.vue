@@ -1,7 +1,7 @@
 <template>
   <c-menu theme="dark" :activeIndex="$route.path" @select="onSelect">
     <c-menu-heading label="概览" />
-    <c-menu-item index="/" icon="icon-compass2" label="主面板" />
+    <c-menu-item v-if="can($permissions.DashboardPage)" index="/" icon="icon-compass2" label="主面板" />
     <!-- <c-menu-item index="/dev/dashboard" icon="icon-compass2" label="开发工作台" /> -->
     <!-- <c-menu-item index="/dev/dashboard" icon="icon-compass2" label="运营工作台" />
           <c-menu-item index="/dev/dashboard" icon="icon-compass2" label="引擎概览" />

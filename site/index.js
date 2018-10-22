@@ -8,17 +8,23 @@ import ElementUI from 'element-ui';
 import toast from "izitoast";
 import 'izitoast/dist/css/izitoast.min.css';
 import './styles/global.scss';
+import permissions from './permissions';
+import can from '../src/services/can';
 
 Vue.use(ElementUI);
 Vue.use(VueRouter);
 Vue.use(Cover);
+Vue.use(can);
 
 window.toast = toast;
 
+// 定义权限校验函数
 const router = new VueRouter({
   mode: 'hash',
   routes
 });
+
+Vue.prototype.$permissions = permissions;
 
 const app = new Vue({
   // eslint-disable-line no-unused-vars
