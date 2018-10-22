@@ -54,14 +54,14 @@
       <c-menu-item index="/service/accounts" label="图形验证码" />
     </c-submenu> -->
     <c-menu-heading label="系统管理" />
+    <c-menu-item index="/clients" icon="icon-shield2" label="授权管理" />
     <c-submenu index="/permission" class="is-open" icon="icon-user" label="账户系统">
       <c-menu-item index="/permission/accounts" label="成员管理" />
       <c-menu-item index="/permission/roles" label="角色管理" />
       <c-menu-item index="/permission/permissions" label="权限管理" />
       <c-menu-item index="/permission/logs" label="操作日志" />
     </c-submenu>
-    <c-menu-item index="/clients" icon="icon-shield2" label="授权管理" />
-    <c-menu-item icon="icon-wrench" index="/utilities" label="系统设置" />
+    
   </c-menu>
 </template>
 

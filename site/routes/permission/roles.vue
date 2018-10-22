@@ -71,27 +71,31 @@
                 <span class="custom-tree-node" slot-scope="{ node, data }">
                   <span>{{ data.label }}</span>
                   <span>
+                    
+                    <el-button
+                      type="text"
+                      class="permission-code"
+                      :title="data.limitString || data.code || '-'"
+                      size="mini">
+                      {{ data.id === 'module0' ? '权限码' : (data.limitString || data.code || '-'  )}}
+                    </el-button>
+                  
+                    <el-button
+                      type="text"
+                      class="permission-description"
+                      :title="data.limitDescription || '-'"
+                      size="mini">
+                      {{ data.id === 'module0' ? '权限描述' : (data.limitDescription || '-')}}
+                    </el-button>
                     <el-button
                       type="text"
                       class="option-type"
                       size="mini">                    
-                      <if v-if="data.id === 'module0'">权限类型</if>
-                      <if v-if="data.type === 1">接口</if>
-                      <if v-if="data.type === 2">页面</if>
-                      <if v-if="data.type === 3">组件</if>
-                      <if v-if="data.id !== 'module0' && !data.code">-</if>
-                    </el-button>
-                    <el-button
-                      type="text"
-                      class="permission-code"
-                      size="mini">
-                      {{ data.id === 'module0' ? '权限码' : (data.limitString || data.code || '-'  )}}
-                    </el-button>
-                    <el-button
-                      type="text"
-                      class="permission-description"
-                      size="mini">
-                      {{ data.id === 'module0' ? '权限描述' : (data.limitDescription || '-')}}
+                      <span v-if="data.id === 'module0'">权限类型</span>
+                      <span v-if="data.type === 1">接口</span>
+                      <span v-if="data.type === 2">页面</span>
+                      <span v-if="data.type === 3">组件</span>
+                      <span v-if="data.id !== 'module0' && !data.code">-</span>
                     </el-button>
                   </span>
                 </span>
@@ -147,10 +151,21 @@
         <el-form-item label="权限名称" label-width="120px" prop="name">
           <el-input :disabled="true" v-model="rolePermissionForm.name" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="角色权限码" label-width="120px">
+        <el-form-item label="权限类型" label-width="120px" prop="type">
+          <el-select disabled v-model="rolePermissionForm.type" placeholder="请选择权限类型" style="width:100%;">
+            <el-option label="接口" value="1"></el-option>
+            <el-option label="页面" value="2"></el-option>
+            <el-option label="组件" value="3"></el-option>
+          </el-select>
+        </el-form-item> 
+        <el-form-item v-if="rolePermissionForm.type == 1" label="角色权限码" label-width="120px">
           <el-input placeholder="输入数据限制参数" v-model="rolePermissionForm.limitString">
           <span slot="prepend">{{ rolePermissionForm.code }}?</span>
-          </el-input>
+          </el-input>          
+          <p class="limit-fields">{{ rolePermissionForm.limitFields }}</p>
+        </el-form-item>
+        <el-form-item v-if="rolePermissionForm.type != 1" label="角色权限码" label-width="120px">
+          <el-input disabled v-model="rolePermissionForm.limitString"></el-input>
           <p class="limit-fields">{{ rolePermissionForm.limitFields }}</p>
         </el-form-item>
         <el-form-item label="角色权限描述" label-width="120px">
@@ -316,7 +331,8 @@ export default {
       if (this.modules.length > 0) {
         this.appendPermissionTreeNode({
           id: 0,
-          name: '全部权限'
+          name: '全部权限',
+          disabled: true
         });
       }
       this.modules.forEach(element => {
@@ -365,25 +381,26 @@ export default {
       this.roleForm.status = `${data.status}`;
     },
     openRolePermissionModal(data, checked) {
-      if (
-        data.type == 'permission' &&
-        checked &&
-        this.couldShowRolePermissionModal
-      ) {
+      if (checked && data.code && this.couldShowRolePermissionModal) {
         this.rolePermissionForm = merge({}, rolePermissionForm);
         this.showRolePermissionModal = true;
         this.rolePermissionForm.id = data.id;
         this.rolePermissionForm.code = data.code;
         this.rolePermissionForm.name = data.label;
         this.rolePermissionForm.limitFields = data.limitFields;
-        for (let i = 0; i < this.editRolePermissions.length; i++) {
-          if (this.editRolePermissions[i].permissionId === data.id) {
-            this.rolePermissionForm.limitString = this.editRolePermissions[
-              i
-            ].limitString;
-            this.rolePermissionForm.limitDescription = this.editRolePermissions[
-              i
-            ].limitDescription;
+        this.rolePermissionForm.type = `${data.type}`;
+        if (data.type != 1) {
+          this.rolePermissionForm.limitString = data.code;
+        } else {
+          for (let i = 0; i < this.editRolePermissions.length; i++) {
+            if (this.editRolePermissions[i].permissionId === data.id) {
+              this.rolePermissionForm.limitString = this.editRolePermissions[
+                i
+              ].limitString;
+              this.rolePermissionForm.limitDescription = this.editRolePermissions[
+                i
+              ].limitDescription;
+            }
           }
         }
       }
@@ -401,7 +418,8 @@ export default {
         this.$refs['permissionTree'].append(
           {
             id: 'module' + element.id,
-            label: element.name
+            label: element.name,
+            disabled: true
           },
           {
             id: 'module' + element.parentId
@@ -477,14 +495,14 @@ export default {
     },
     async handleCurrentChange(val) {
       this.selectRole = val;
-      for(let i =0;i<this.permissions.length;i++){
+      for (let i = 0; i < this.permissions.length; i++) {
         let node = this.$refs.permissionTree.getNode({
           id: this.permissions[i].id
-        })
-        if(node){
-          console.log(node)
-          node.data.limitString = "";
-          node.data.limitDescription = "";
+        });
+        if (node) {
+          console.log(node);
+          node.data.limitString = '';
+          node.data.limitDescription = '';
         }
       }
       let res = await api.GetRolePermissionIdsAndAccountIds({
@@ -645,8 +663,9 @@ export default {
     width: 80px;
   }
   .permission-code {
-    min-width: 200px;
+    width: 500px;
     text-align: left;
+    overflow: hidden;
   }
   .permission-description {
     min-width: 200px;

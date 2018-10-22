@@ -3,6 +3,7 @@ import NotFoundView from './errors/not-found.vue';
 
 // Overview
 import HomeView from './home.vue';
+
 // import StartedView from './getting-started.vue';
 
 // Layouts
@@ -81,9 +82,9 @@ const PermissionUsers = () => import('./permission/users.vue');
 const PermissionPermissions = () => import('./permission/permissions.vue');
 const PermissionRoles = () => import('./permission/roles.vue');
 const PermissionLogs = () => import('./permission/logs.vue');
+const ClientsView = () => import('./clients.vue');
 
-export default [
-  {
+export default [{
     path: '/auth/login',
     component: AuthLogin
   },
@@ -107,18 +108,6 @@ export default [
     path: '/error',
     component: ErrorView
   },
-
-  // Templates
-  // {
-  //   path: '/templates/center',
-  //   component: CenterTemplate
-  // },
-  // {
-  //   path: '/templates/mini',
-  //   component: MiniTemplate
-  // },
-
-  // Dashboard
   {
     path: '/',
     component: DashboardView,
@@ -140,216 +129,10 @@ export default [
         path: '/permission/permissions',
         component: PermissionPermissions
       },
-      // 原有路由
-      // Layouts
-      // {
-      //   path: '/layouts/templates',
-      //   component: TemplatesView
-      // },
-      // {
-      //   path: '/layouts/grid',
-      //   component: GridView
-      // },
-      // {
-      //   path: '/layouts/level',
-      //   component: LevelView
-      // },
-      // {
-      //   path: '/layouts/stack',
-      //   component: StackView
-      // },
-      // {
-      //   path: '/layouts/scroll-view',
-      //   component: ScrollView
-      // },
-
-      // Core
-      // {
-      //   path: '/core/icons',
-      //   component: IconsView
-      // },
-      // {
-      //   path: '/core/panels',
-      //   component: PanelsView
-      // },
-      // {
-      //   path: '/core/buttons',
-      //   component: ButtonsView
-      // },
-      // {
-      //   path: '/core/badges',
-      //   component: BadgesView
-      // },
-      // {
-      //   path: '/core/tags',
-      //   component: TagsView
-      // },
-      // {
-      //   path: '/core/notes',
-      //   component: NotesView
-      // },
-      // {
-      //   path: '/core/boxes',
-      //   component: BoxesView
-      // },
-      // {
-      //   path: '/core/progress',
-      //   component: ProgressView
-      // },
-      // {
-      //   path: '/core/divider',
-      //   component: DividerView
-      // },
-
-      // Navigations
-      // {
-      //   path: '/navigations/menu',
-      //   component: MenuView
-      // },
-      // {
-      //   path: '/navigations/pagination',
-      //   component: PaginationView
-      // },
-      // {
-      //   path: '/navigations/breadcrumb',
-      //   component: BreadcrumbView
-      // },
-      // {
-      //   path: '/navigations/dropdown',
-      //   component: DropdownView
-      // },
-      // {
-      //   path: '/navigations/navs',
-      //   component: NavsView
-      // },
-      // {
-      //   path: '/navigations/navbar',
-      //   component: NavbarView
-      // },
-      // {
-      //   path: '/navigations/steps',
-      //   component: StepsView
-      // },
-      // {
-      //   path: '/navigations/tabs',
-      //   component: TabsView
-      // },
-
-      // Forms
-      // {
-      //   path: '/form/controls',
-      //   component: FormControlsView
-      // },
-      // {
-      //   path: '/form/layouts',
-      //   component: FormLayoutsView
-      // },
-      // {
-      //   path: '/form/validation',
-      //   component: FormValidationView
-      // },
-      // {
-      //   path: '/form/date-picker',
-      //   component: FormDatePickerView
-      // },
-      // {
-      //   path: '/form/editor',
-      //   component: EditorView
-      // },
-      // {
-      //   path: '/form/select',
-      //   component: SelectView
-      // },
-      // {
-      //   path: '/form/slider',
-      //   component: SliderView
-      // },
-
-      // Data
-      // {
-      //   path: '/data/tables',
-      //   component: TablesView
-      // },
-      // {
-      //   path: '/data/charts',
-      //   component: ChartsView
-      // },
-
-      // // Feedback
-      // {
-      //   path: '/feedback/popup',
-      //   component: PopupView
-      // },
-      // {
-      //   path: '/feedback/modal',
-      //   component: ModalView
-      // },
-      // {
-      //   path: '/feedback/alert',
-      //   component: AlertView
-      // },
-      // {
-      //   path: '/feedback/flash',
-      //   component: FlashView
-      // },
-      // {
-      //   path: '/feedback/toast',
-      //   component: ToastView
-      // },
-      // {
-      //   path: '/feedback/tooltip',
-      //   component: TooltipView
-      // },
-      // {
-      //   path: '/feedback/notification',
-      //   component: NotificationView
-      // },
-
-      // Extra
-      // {
-      //   path: '/blocks/account',
-      //   component: AccountView
-      // },
-      // {
-      //   path: '/blocks/cell',
-      //   component: CellView
-      // },
-      // {
-      //   path: '/blocks/list',
-      //   component: ListView
-      // },
-      // {
-      //   path: '/blocks/sign',
-      //   component: SignView
-      // },
-      // {
-      //   path: '/blocks/message',
-      //   component: MessageView
-      // },
-      // {
-      //   path: '/blocks/card',
-      //   component: CardView
-      // },
-      // {
-      //   path: '/blocks/stream',
-      //   component: StreamView
-      // },
-      // {
-      //   path: '/blocks/toolbar',
-      //   component: ToolbarView
-      // },
-      // {
-      //   path: '/widgets',
-      //   component: WidgetsView
-      // },
-      // {
-      //   path: '/utilities',
-      //   component: UtilitiesView
-      // },
-      // {
-      //   path: '/getting-started',
-      //   component: StartedView
-      // },
+      {
+        path: '/clients',
+        component: ClientsView
+      },
       {
         path: '',
         component: HomeView
