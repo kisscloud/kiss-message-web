@@ -81,7 +81,7 @@
                       type="text"
                       class="permission-code"
                       size="mini">
-                      {{ data.id === 'module0' ? '权限码' : (data.limitString || '-'  )}}
+                      {{ data.id === 'module0' ? '权限码' : (data.limitString || data.code || '-'  )}}
                     </el-button>
                     <el-button
                       type="text"
@@ -359,13 +359,14 @@ export default {
         checked &&
         this.couldShowRolePermissionModal
       ) {
+        this.rolePermissionForm = merge({}, rolePermissionForm);
         this.showRolePermissionModal = true;
         this.rolePermissionForm.id = data.id;
+        this.rolePermissionForm.code = data.code;
         this.rolePermissionForm.name = data.label;
         this.rolePermissionForm.limitFields = data.limitFields;
         for (let i = 0; i < this.editRolePermissions.length; i++) {
           if (this.editRolePermissions[i].permissionId === data.id) {
-            this.rolePermissionForm.code = data.code;
             this.rolePermissionForm.limitString = this.editRolePermissions[
               i
             ].limitString;
@@ -382,7 +383,6 @@ export default {
       });
       node.data.limitString = this.rolePermissionForm.limitString;
       node.data.limitDescription = this.rolePermissionForm.limitDescription;
-      this.rolePermissionForm = merge({}, rolePermissionForm);
       this.showRolePermissionModal = false;
     },
     appendPermissionTreeNode(element) {
