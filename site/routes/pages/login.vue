@@ -3,9 +3,10 @@
     <c-content>
       <section class="sign u-m-auto">
         <h1 class="sign__title">Kiss Console</h1>
+          <!-- <p class="sign__text">授权</p> -->
         <div class="sign__body">
-          <!-- <h1 class="sign__title">KISS Console</h1> -->
-          <!-- <p class="sign__text">Login In with your administrator account</p> -->
+          <!-- <h1 class="sign__title">Kiss Console</h1> -->
+          <!-- <p class="sign__text">统一授权中心</p> -->
           <c-form>
             <c-form-field label="用户名">
               <c-form-input v-model="form.username" type="text"></c-form-input>

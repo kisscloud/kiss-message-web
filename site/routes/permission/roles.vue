@@ -69,31 +69,25 @@
                 @check-change="openRolePermissionModal"
                 :props="defaultProps">
                 <span class="custom-tree-node" slot-scope="{ node, data }">
-                  <span>{{ node.label }}</span>
+                  <span>{{ data.label }}</span>
                   <span>
+                    <el-button
+                      type="text"
+                      class="option-type"
+                      size="mini">
+                      {{ data.id === 'module0' ? '类型' : (data.code ? '权限' : '模块') }}
+                    </el-button>
                     <el-button
                       type="text"
                       class="permission-code"
                       size="mini">
-                      {{ data.code || '-' }}
+                      {{ data.id === 'module0' ? '权限码' : (data.limitString || '-'  )}}
                     </el-button>
-                    <el-button
-                      type="text"
-                      class="option-type"
-                      size="mini">
-                      {{ data.type }}
-                    </el-button>
-                    <!-- <el-button
-                      type="text"
-                      class="option-type"
-                      size="mini">
-                      {{ data.code ? '权限' : '模块' }}
-                    </el-button> -->
                     <el-button
                       type="text"
                       class="permission-description"
                       size="mini">
-                      {{ data.description || '-' }}
+                      {{ data.id === 'module0' ? '权限描述' : (data.limitDescription || '-')}}
                     </el-button>
                   </span>
                 </span>
@@ -150,7 +144,7 @@
           <el-input :disabled="true" v-model="rolePermissionForm.name" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="角色权限码" label-width="120px">
-          <el-input placeholder="输入数据限制参数" v-model="rolePermissionForm.limitData">
+          <el-input placeholder="输入数据限制参数" v-model="rolePermissionForm.limitString">
           <span slot="prepend">{{ rolePermissionForm.code }}?</span>
           </el-input>
           <p class="limit-fields">{{ rolePermissionForm.limitFields }}</p>
@@ -166,7 +160,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="showRolePermissionModal = false">取 消</el-button>
-        <el-button type="primary" @click="submitRoleForm()">保存</el-button>
+        <el-button type="primary" @click="addRolePermission(rolePermissionForm)">保存</el-button>
       </div>
     </el-dialog> 
   </c-main>
@@ -182,22 +176,26 @@ var roleForm = {
   status: '1'
 };
 
+var rolePermissionForm = {};
+
 export default {
   name: 'PersmissionUsers',
   data() {
     return {
       showRoleFormModal: false,
       showRolePermissionModal: false,
+      couldShowRolePermissionModal: false,
       tabActiveName: 'first',
       selectRole: {},
       selectPermissions: [],
+      editRolePermissions: [],
       accounts: [],
       selectAccounts: [],
       filterMethod(query, item) {
         return item.label.indexOf(query) > -1;
       },
       roleForm: merge({}, roleForm),
-      rolePermissionForm: {},
+      rolePermissionForm: merge({}, rolePermissionForm),
       roleFormRules: {
         name: [
           {
@@ -222,13 +220,11 @@ export default {
       this.roles = res.data.roles;
       this.selectPermissions = res.data.firstRolePermissions;
       this.selectAccounts = res.data.firstRoleAccounts;
-
+      this.couldShowRolePermissionModal = true;
       if (res.data.modules.length > 0) {
         this.appendPermissionTreeNode({
           id: 0,
-          name: '全部权限',
-          code: '权限码',
-          description: '描述'
+          name: '全部权限'
         });
       }
       res.data.modules.forEach(element => {
@@ -248,9 +244,12 @@ export default {
         this.$refs.permissionTree.append(
           {
             id: element.id,
+            type: 'permission',
             label: element.name,
             code: element.code,
-            limitFields: element.limitFields
+            limitFields: element.limitFields,
+            limitString: '',
+            limitDescription: ''
           },
           {
             id: 'module' + element.moduleId
@@ -355,14 +354,36 @@ export default {
       this.roleForm.status = `${data.status}`;
     },
     openRolePermissionModal(data, checked) {
-      console.log(data)
-      if (checked) {
+      if (
+        data.type == 'permission' &&
+        checked &&
+        this.couldShowRolePermissionModal
+      ) {
         this.showRolePermissionModal = true;
+        this.rolePermissionForm.id = data.id;
         this.rolePermissionForm.name = data.label;
-        this.rolePermissionForm.code = data.code;
         this.rolePermissionForm.limitFields = data.limitFields;
-        this.rolePermissionForm.limitDescription = '';
+        for (let i = 0; i < this.editRolePermissions.length; i++) {
+          if (this.editRolePermissions[i].permissionId === data.id) {
+            this.rolePermissionForm.code = data.code;
+            this.rolePermissionForm.limitString = this.editRolePermissions[
+              i
+            ].limitString;
+            this.rolePermissionForm.limitDescription = this.editRolePermissions[
+              i
+            ].limitDescription;
+          }
+        }
       }
+    },
+    addRolePermission() {
+      let node = this.$refs.permissionTree.getNode({
+        id: this.rolePermissionForm.id
+      });
+      node.data.limitString = this.rolePermissionForm.limitString;
+      node.data.limitDescription = this.rolePermissionForm.limitDescription;
+      this.rolePermissionForm = merge({}, rolePermissionForm);
+      this.showRolePermissionModal = false;
     },
     appendPermissionTreeNode(element) {
       if (element.id !== 0) {
@@ -388,7 +409,12 @@ export default {
       let permissions = [];
       this.$refs['permissionTree'].getCheckedNodes().forEach(element => {
         if (typeof element.code !== 'undefined' && element.code) {
-          permissions.push(element.id);
+          console.log(element)
+          permissions.push({
+            permissionId: element.id,
+            limitString: element.limitString,
+            limitDescription: element.limitDescription
+          });
         }
       });
       if (permissions.length === 0) {
@@ -445,9 +471,30 @@ export default {
       });
       if (res.code === codes.Success) {
         if (this.$refs.permissionTree) {
-          this.$refs.permissionTree.setCheckedKeys(res.data.permissions);
+          let checkKeys = [];
+          this.editRolePermissions = res.data.permissions;
+          for (let i = 0; i < res.data.permissions.length; i++) {
+            checkKeys.push(res.data.permissions[i].permissionId);
+            let node = this.$refs.permissionTree.getNode({
+              id: res.data.permissions[i].permissionId
+            });
+            if (res.data.permissions[i].limitString) {
+              node.data.limitString = `${node.data.code}?${
+                res.data.permissions[i].limitString
+              }`;
+            }
+            if (res.data.permissions[i].limitDescription) {
+              node.data.limitDescription =
+                res.data.permissions[i].limitDescription;
+            }
+          }
+          this.$refs.permissionTree.setCheckedKeys(checkKeys);
         }
+        this.couldShowRolePermissionModal = false;
         this.selectAccounts = res.data.accounts;
+        setTimeout(() => {
+          this.couldShowRolePermissionModal = true;
+        }, 50);
       } else {
         this.$message({
           message: res.message,
@@ -574,13 +621,14 @@ export default {
   .option-type {
     position: relative;
     top: 1px;
+    width: 50px;
   }
   .permission-code {
     min-width: 200px;
     text-align: left;
   }
   .permission-description {
-    min-width: 100px;
+    min-width: 200px;
     text-align: left;
   }
 
@@ -589,6 +637,9 @@ export default {
     margin-bottom: -16px;
     font-size: 12px;
     color: #909090;
+  }
+  .el-input.is-disabled .el-input__inner {
+    color: #777777;
   }
 }
 </style>
