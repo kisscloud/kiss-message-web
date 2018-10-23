@@ -33,23 +33,28 @@ export const AuthLogin = (data, options) => {
 };
 
 // 获取用户页面参数
+export const GetPageDashboardParams = (data, options) => {
+  return ajax.get('/kiss-console/page/account/dashboard', data, options);
+};
+
+// 获取用户页面参数
 export const GetPagePermissonsAccountsParams = (data, options) => {
-  return ajax.get('/kiss-console/page/permission/accounts', data, options);
+  return ajax.get('/kiss-console/page/account/accounts', data, options);
 };
 
 // 获取角色页面参数
 export const GetPagePermissionRolesParams = (data, options) => {
-  return ajax.get('/kiss-console/page/permission/roles', data, options);
+  return ajax.get('/kiss-console/page/account/roles', data, options);
 };
 
 // 获取角色页面参数
 export const GetPagePermissionPermissionsParams = (data, options) => {
-  return ajax.get('/kiss-console/page/permission/permissions', data, options);
+  return ajax.get('/kiss-console/page/account/permissions', data, options);
 };
 
 // 获取角色页面参数
 export const GetPagePermissionLogsParams = (data, options) => {
-  return ajax.get('/kiss-console/page/permission/logs', data, options);
+  return ajax.get('/kiss-console/page/account/logs', data, options);
 };
 
 // 获取用户列表

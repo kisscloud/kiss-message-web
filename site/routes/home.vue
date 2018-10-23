@@ -10,7 +10,7 @@
             <template slot="right">
               <div class="u-text-right">
                 <div class="u-text-muted">部门数</div>
-                <div class="u-h1">371</div>
+                <div class="u-h1">{{ accountGroups }}</div>
               </div>
             </template>
           </c-level>
@@ -113,6 +113,8 @@
 </template>
 
 <script>
+import * as api from './../../src/api';
+import * as codes from './../../src/codes';
 import ActivityChart from './data/charts/basic.vue';
 import data from './data/data.json';
 export default {
@@ -123,8 +125,15 @@ export default {
   data() {
     return {
       users: data.users,
-      orders: data.orders
+      orders: data.orders,
+      accountGroups: 0
     };
+  },
+  async mounted() {
+    let res = await api.GetPageDashboardParams();
+    if (res.code === codes.Success) {
+      this.accountGroups = res.data.accountGroups;
+    }
   },
   methods: {
     slice(prop, start, end) {
