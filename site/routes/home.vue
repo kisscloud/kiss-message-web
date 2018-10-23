@@ -5,7 +5,7 @@
         <c-panel>
           <c-level>
             <template slot="left">
-              <i class="icon-stats-growth2 icon-2x u-color-success"></i>
+              <i class="icon-tree3 icon-2x u-color-primary"></i>
             </template>
             <template slot="right">
               <div class="u-text-right">
@@ -21,7 +21,7 @@
         <c-panel>
           <c-level>
             <template slot="left">
-              <i class="icon-users icon-2x u-color-info"></i>
+              <i class="icon-user-tie icon-2x u-color-info"></i>
             </template>
             <template slot="right">
               <div class="u-text-right">
@@ -37,7 +37,7 @@
         <c-panel>
           <c-level>
              <template slot="left">
-              <i class="icon-download4 icon-2x u-color-primary"></i>
+              <i class="icon-user icon-2x u-color-success"></i>
             </template>
             <template slot="right">
               <div class="u-text-right">
@@ -53,7 +53,7 @@
         <c-panel>
           <c-level>
             <template slot="left">
-              <i class="icon-download4 icon-2x u-color-primary"></i>
+              <i class="icon-users icon-2x u-color-warning"></i>
             </template>
             <template slot="right">
               <div class="u-text-right">
