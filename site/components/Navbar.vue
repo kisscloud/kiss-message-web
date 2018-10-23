@@ -25,7 +25,7 @@
         <div class="navbar__item">
           <a role="button" class="account">
             <figure class="account__media">
-              <img class="avatar" :src="'static/images/avatar.jpg'" alt="">
+              <img class="avatar" :src="'static/images/avatar.png'" alt="">
             </figure>
             <div class="account__after">
               <i class="i-caret i-caret--light"></i>

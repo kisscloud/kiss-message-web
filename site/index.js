@@ -24,7 +24,7 @@ const router = new VueRouter({
   routes
 });
 
-Vue.prototype.$permissions = permissions;
+Vue.prototype.$auth = permissions;
 
 const app = new Vue({
   // eslint-disable-line no-unused-vars
