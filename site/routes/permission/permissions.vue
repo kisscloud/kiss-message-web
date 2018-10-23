@@ -635,7 +635,10 @@ export default {
         this.showPermissions = [];
         this.permissions.forEach(element => {
           let level = this.getModuleLevel(element.moduleId);
-          if (element.moduleId === data.id || level.indexOf(data.id) > -1) {
+          if (
+            element.moduleId === data.id ||
+            level.indexOf(data.id + ',') > -1
+          ) {
             this.showPermissions.push(merge({}, element));
           }
         });

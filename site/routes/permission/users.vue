@@ -54,7 +54,7 @@
           @node-drag-over="handleDragOver"
           @node-drag-end="handleDragEnd"
           @node-drop="handleDrop"
-          @node-click="clickModule"
+          @node-click="clickGroup"
           :expand-on-click-node="false"
           :highlight-current="true"
           :allow-drop="allowDrop"
@@ -291,6 +291,7 @@ export default {
       groupForm: merge({}, groupForm),
       userFormRules: {},
       groupFormRules: merge.recursive(true, {}, groupFormRules),
+      selectGroup: {},
       accounts: [],
       showAccounts: [],
       accountsCount: 0,
@@ -661,7 +662,7 @@ export default {
           this.$refs.groupTree.setCurrentKey({
             id: 0
           });
-          this.clickModule({ id: 0 });
+          this.clickGroup({ id: 0 });
           this.$message({
             type: 'success',
             message: `已删除 ${group.name}`
@@ -705,17 +706,31 @@ export default {
         });
       }
     },
-    clickModule(data) {
+    clickGroup(data) {
+      this.selectGroup = data;
       if (data.id === 0) {
         this.showAccounts = this.accounts;
       } else {
         this.showAccounts = [];
         this.accounts.forEach(element => {
-          if (element.groupId === data.id) {
+          let level = this.getGroupLevel(element.groupId);
+          console.log(data.id);
+          if (
+            element.groupId === data.id ||
+            level.indexOf(data.id + ',') > -1
+          ) {
             this.showAccounts.push(merge({}, element));
           }
         });
       }
+    },
+    getGroupLevel(GroupId) {
+      for (let i = 0; i < this.userFormGroups.length; i++) {
+        if (this.userFormGroups[i].id === GroupId) {
+          return this.userFormGroups[i].level;
+        }
+      }
+      return '';
     },
     handleDragStart(node, ev) {
       console.log('drag start', node);
