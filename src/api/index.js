@@ -158,3 +158,33 @@ export const PostRolePermissions = (data, options) => {
 export const PostRolesAccounts = (data, options) => {
   return ajax.post('/kiss-console/service/account/role/accounts', data, options);
 };
+
+// 添加授权客户端
+export const PostClient = (data, options) => {
+  return ajax.post('/kiss-console/service/account/client', data, options);
+};
+
+// 更新授权客户端
+export const PutClient = (data, options) => {
+  return ajax.put('/kiss-console/service/account/client', data, options);
+};
+
+// 删除授权客户端
+export const DeleteClient = (id, options) => {
+  return ajax.delete(`/kiss-console/service/account/client?id=${id}`, options);
+};
+
+// 绑定客户端权限模块
+export const PutClientModules = (data, options) => {
+  return ajax.put(`/kiss-console/service/account/client/modules`, data, options);
+};
+
+// 获取客户端权限模块
+export const GetClientModules = (data, options) => {
+  return ajax.get(`/kiss-console/service/account/client/modules?clientId=${data.id}`, data, options);
+};
+
+// 获取客户端权限模块
+export const GetOperationLogs = (query, options) => {
+  return ajax.get(`/kiss-console/service/account/operation/logs?page=${query.page}&size=${query.size}`, options);
+};

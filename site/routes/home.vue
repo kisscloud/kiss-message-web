@@ -1,16 +1,33 @@
 <template lang="nunjucks">
   <c-main>
     <c-row>
+
+       <c-col sm="12" lg="6">
+        <c-panel>
+          <c-level>
+             <template slot="left">
+              <i class="icon-user icon-2x u-color-primary"></i>
+            </template>
+            <template slot="right">
+              <div class="u-text-right">
+                <div class="u-text-muted">在职成员</div>
+                <div class="u-h1">{{ accountsCount }}</div>
+              </div>
+            </template>
+          </c-level>
+        </c-panel>
+      </c-col>
+
       <c-col sm="12" lg="6">
         <c-panel>
           <c-level>
             <template slot="left">
-              <i class="icon-tree3 icon-2x u-color-primary"></i>
+              <i class="icon-tree3 icon-2x u-color-success"></i>
             </template>
             <template slot="right">
               <div class="u-text-right">
                 <div class="u-text-muted">部门数</div>
-                <div class="u-h1">{{ accountGroups }}</div>
+                <div class="u-h1">{{ accountGroupsCount }}</div>
               </div>
             </template>
           </c-level>
@@ -26,23 +43,7 @@
             <template slot="right">
               <div class="u-text-right">
                 <div class="u-text-muted">角色数</div>
-                <div class="u-h1">113</div>
-              </div>
-            </template>
-          </c-level>
-        </c-panel>
-      </c-col>
-
-      <c-col sm="12" lg="6">
-        <c-panel>
-          <c-level>
-             <template slot="left">
-              <i class="icon-user icon-2x u-color-success"></i>
-            </template>
-            <template slot="right">
-              <div class="u-text-right">
-                <div class="u-text-muted">在职成员</div>
-                <div class="u-h1">1231</div>
+                <div class="u-h1">{{ rolesCount }}</div>
               </div>
             </template>
           </c-level>
@@ -53,12 +54,12 @@
         <c-panel>
           <c-level>
             <template slot="left">
-              <i class="icon-users icon-2x u-color-warning"></i>
+              <i class="icon-key icon-2x u-color-danger"></i>
             </template>
             <template slot="right">
               <div class="u-text-right">
-                <div class="u-text-muted">全部成员</div>
-                <div class="u-h1">1231</div>
+                <div class="u-text-muted">权限数</div>
+                <div class="u-h1">{{ permissionsCount }}</div>
               </div>
             </template>
           </c-level>
@@ -126,13 +127,19 @@ export default {
     return {
       users: data.users,
       orders: data.orders,
-      accountGroups: 0
+      accountsCount: 0,
+      rolesCount: 0,
+      accountGroupsCount: 0,
+      permissionsCount: 0
     };
   },
   async mounted() {
     let res = await api.GetPageDashboardParams();
     if (res.code === codes.Success) {
-      this.accountGroups = res.data.accountGroups;
+      this.accountsCount = res.data.accountsCount;
+      this.accountGroupsCount = res.data.accountGroupsCount;
+      this.rolesCount = res.data.rolesCount;
+      this.permissionsCount = res.data.permissionsCount;
     }
   },
   methods: {

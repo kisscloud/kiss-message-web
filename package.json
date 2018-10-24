@@ -102,6 +102,8 @@
     "simplebar": "^2.6.1",
     "vee-validate": "^2.1.0-beta.1",
     "vue": "^2.5.13",
+    "vue-json-pretty": "^1.4.1",
+    "vue-json-viewer": "^2.0.6",
     "vue-multiselect": "^2.0.8",
     "vue-router": "^3.0.1"
   }
