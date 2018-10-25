@@ -2,8 +2,8 @@
   <c-app id="page-login">
     <c-content>
       <section class="sign u-m-auto">
-        <h1 class="sign__title">Kiss Console</h1>
-          <!-- <p class="sign__text">授权</p> -->
+        <h1 class="sign__title">统一账户中心</h1>
+          <p class="sign__text">Kiss Cloud</p>
         <div class="sign__body">
           <!-- <h1 class="sign__title">Kiss Console</h1> -->
           <!-- <p class="sign__text">统一授权中心</p> -->
