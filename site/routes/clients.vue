@@ -1,46 +1,40 @@
 <template>
-  <c-main id="page-roles">
+  <c-main id="page-clients">
     <header class="toolbar">
       <c-level>
         <template slot="left">
-                  <div class="cell">
-                    <!-- <div class="cell__media">
-                      <i class="icon-footprint"></i>
-                    </div> -->
-                    <div class="cell__content">
-                      <h1 class="toolbar__title">授权管理<span>子系统接入授权管理</span></h1>
-                    </div>
-                  </div>
-</template>
+          <div class="cell">
+            <div class="cell__content">
+              <h1 class="toolbar__title">授权管理<span>子系统接入授权管理</span></h1>
+            </div>
+          </div>
+        </template>
 
-<template slot="right">
-  <el-button @click="openRoleFormModal()" type="primary" size="small">
-    添加客户端
-  </el-button>
-  <!-- <c-level-item><c-button icon-start="icon-plus-circle" type="info" smart>添加</c-button></c-level-item> -->
-</template>
+        <template slot="right">
+          <el-button @click="openClientFormModal()" type="primary" size="small">
+            添加客户端
+          </el-button>
+        </template>
       </c-level>
     </header>
     
     <el-container>
 
-      <!-- 部门控件 -->
       <el-aside style="">
         <el-card class="box-card">
           <div slot="header" class="clearfix">
               <span>客户端列表</span>
-              <!-- <el-button style="float: right; padding: 3px 0" type="text">添加部门</el-button> -->
           </div>
           <el-table
-            :data="roles"
+            :data="clients"
             ref="roleTable"
             :show-header="false"
             :highlight-current-row="true"
             @current-change="handleCurrentChange"
             style="width: 100%">
             <el-table-column
-              prop="name"
-              label="角色名称"
+              prop="clientName"
+              label="客户端名称"
               >
             </el-table-column>
              <el-table-column
@@ -48,7 +42,7 @@
               align="right"
               label="操作">
               <span slot-scope="scope" style="float:right;">
-                <el-button @click="openEditRoleModal(scope.row)" class="icon-pen5" type="text" size="mini"></el-button>
+                <el-button @click="openEditClientModal(scope.row)" class="icon-pen5" type="text" size="mini"></el-button>
               </span>
             </el-table-column>
           </el-table>
@@ -59,57 +53,56 @@
           <el-tabs type="border-card" v-model="tabActiveName">
             <el-tab-pane label="权限模块" name="first">
               <el-tree
-                :data="permissionTree"
-                ref="permissionTree"
+                :data="moduleTree"
+                ref="moduleTree"
                 show-checkbox
                 node-key="id"
                 :default-expand-all="true"
-                :default-checked-keys="selectPermissions"
-                @check-change="openRolePermissionModal"
+                :default-checked-keys="selectModules"
                 :props="defaultProps">
                 <span class="custom-tree-node" slot-scope="{ node, data }">
                   <span>{{ data.label }}</span>
                 </span>
               </el-tree>
               <br>
-              <el-button v-show="permissionTree.length != 0" size="small" type="primary" @click="savePermissions()">绑定模块</el-button>
+              <el-button v-show="moduleTree.length != 0" size="small" type="primary" @click="saveModules()">绑定模块</el-button>
             </el-tab-pane>
             <el-tab-pane label="客户端信息" name="second">
-              <dl>
-                <dt>客户端名称</dt>
-                <dd>我是一个客户端</dd>
-                <dt>Client ID</dt>
-                <dd>White cold drink</dd>
-                <dt>Client Secret</dt>
-                <dd>White cold drink</dd>
+              <dl class="client-info">
+                <li>
+                  <dt>客户端名称</dt>
+                  <dd>{{ selectClient.clientName }}</dd>
+                </li>
+                <li>
+                  <dt>Client ID</dt>
+                  <dd>{{ selectClient.clientID }}</dd>
+                </li>
+                <li>
+                  <dt>Client Secret</dt>
+                  <dd>{{ selectClient.clientSecret || '********' }}</dd>
+                </li>
               </dl>
             </el-tab-pane>
           </el-tabs>
       </el-main>
     </el-container>
 
-    <el-dialog :title="roleForm.id? '编辑客户端': '添加客户端'" :visible.sync="showRoleFormModal">
-      <el-form :model="roleForm" :rules="roleFormRules" ref="roleForm" :validate-on-rule-change="false">
-        <!-- <el-form-item label="父部门" label-width="80px">
-          <el-select v-model="form2.region" placeholder="请选择活动区域">
-            <el-option label="区域一" value="shanghai"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
-          </el-select>
-        </el-form-item> -->
-        <el-form-item label="客户端名称" label-width="80px" prop="name">
-          <el-input v-model="roleForm.name" autocomplete="off"></el-input>
+    <el-dialog :title="clientForm.id? '编辑客户端': '添加客户端'" :visible.sync="showClientFormModal">
+      <el-form :model="clientForm" :rules="clientFormRules" ref="clientForm" :validate-on-rule-change="false">
+        <el-form-item label="客户端名称" label-width="120px" prop="clientName">
+          <el-input v-model="clientForm.clientName" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="角色状态" label-width="80px">
-          <el-radio-group  v-model="roleForm.status">
+        <el-form-item label="客户端状态" label-width="120px">
+          <el-radio-group  v-model="clientForm.status">
             <el-radio label="1">有效</el-radio>
             <el-radio label="0">无效</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button v-show="roleForm.id" @click="deleteRole(roleForm)" style="float:left;">删除角色</el-button>
-        <el-button @click="showRoleFormModal = false">取 消</el-button>
-        <el-button type="primary" @click="submitRoleForm()">{{ roleForm.id? '保存': '添加' }}</el-button>
+        <el-button v-show="clientForm.id" @click="deleteClient(clientForm)" style="float:left;">删除客户端</el-button>
+        <el-button @click="showClientFormModal = false">取 消</el-button>
+        <el-button type="primary" @click="submitClientForm()">{{ clientForm.id? '保存': '添加' }}</el-button>
       </div>
     </el-dialog>
 
@@ -117,468 +110,342 @@
 </template>
 
 <script>
-  import * as api from '../../src/api';
-  import * as codes from '../../src/codes';
-  import merge from 'merge';
-  
-  var roleForm = {
-    name: null,
-    status: '1'
-  };
-  
-  var rolePermissionForm = {};
-  
-  export default {
-    name: 'Clients',
-    data() {
-      return {
-        showRoleFormModal: false,
-        showRolePermissionModal: false,
-        couldShowRolePermissionModal: false,
-        tabActiveName: 'first',
-        selectRole: {},
-        selectPermissions: [],
-        editRolePermissions: [],
-        permissions: [],
-        accounts: [],
-        selectAccounts: [],
-        filterMethod(query, item) {
-          return item.label.indexOf(query) > -1;
-        },
-        roleForm: merge({}, roleForm),
-        rolePermissionForm: merge({}, rolePermissionForm),
-        roleFormRules: {
-          name: [{
+import * as api from '../../src/api';
+import * as codes from '../../src/codes';
+import merge from 'merge';
+
+var clientForm = {
+  clientName: null,
+  status: '1'
+};
+
+var roleModuleForm = {};
+
+export default {
+  name: 'Clients',
+  data() {
+    return {
+      showClientFormModal: false,
+      showClientModuleModal: false,
+      tabActiveName: 'first',
+      selectClient: {},
+      selectModules: [],
+      editClientModules: [],
+      modules: [],
+      accounts: [],
+      selectAccounts: [],
+      filterMethod(query, item) {
+        return item.label.indexOf(query) > -1;
+      },
+      clientForm: merge({}, clientForm),
+      roleModuleForm: merge({}, roleModuleForm),
+      clientFormRules: {
+        clientName: [
+          {
             required: true,
-            message: '请输入角色名称',
+            message: '请输入客户端名称',
             trigger: 'change'
-          }]
-        },
-        roles: [],
-        permissionTree: [],
-        defaultProps: {
-          children: 'children',
-          label: 'label'
-        }
-      };
-    },
-    async mounted() {
-      let res = await api.GetPagePermissionRolesParams();
-  
-      if (res.code === codes.Success) {
-        this.roles = res.data.roles || [];
-        this.selectPermissions = res.data.firstRolePermissions || [];
-        this.selectAccounts = res.data.firstRoleAccounts || [];
-        this.couldShowRolePermissionModal = true;
-        this.modules = res.data.modules || [];
-        this.allAccounts = res.data.accounts.accounts || [];
-        this.permissions = res.data.permissions || [];
-        this.generatePermissionTree();
+          }
+        ]
+      },
+      clients: [],
+      moduleTree: [],
+      defaultProps: {
+        children: 'children',
+        label: 'label'
       }
-    },
-    methods: {
-      submitRoleForm() {
-        this.$refs['roleForm'].validate(async valid => {
-          if (valid) {
-            if (this.roleForm.id) {
-              this.roleForm.status = parseInt(this.roleForm.status);
-              let res = await api.PutRoles(this.roleForm);
-              if (res.code === codes.Success) {
-                this.showRoleFormModal = false;
-                for (let i = 0; i < this.roles.length; i++) {
-                  if (this.roles[i].id === res.data.id) {
-                    this.roles[i].name = res.data.name;
-                    this.roles[i].status = res.data.status;
-                    break;
-                  }
+    };
+  },
+  async mounted() {
+    let res = await api.GetPageClientsParams();
+
+    if (res.code === codes.Success) {
+      this.clients = res.data.clients || [];
+      this.selectModules = res.data.firstClientModules || [];
+      this.modules = res.data.allModules || [];
+      this.generateModuleTree();
+    }
+  },
+  methods: {
+    submitClientForm() {
+      this.$refs['clientForm'].validate(async valid => {
+        if (valid) {
+          if (this.clientForm.id) {
+            this.clientForm.status = parseInt(this.clientForm.status);
+            let res = await api.PutClient(this.clientForm);
+            if (res.code === codes.Success) {
+              this.showClientFormModal = false;
+              for (let i = 0; i < this.clients.length; i++) {
+                if (this.clients[i].id === res.data.id) {
+                  this.clients[i].clientName = res.data.clientName;
+                  this.clients[i].status = res.data.status;
+                  break;
                 }
-                this.$message({
-                  message: '角色更新成功',
-                  type: 'success'
-                });
-              } else if (res.code === codes.ValidateError) {
-                this.roleForm.status = `${this.roleForm.status}`;
-                let rules = merge.recursive(true, {}, this.roleFormRules);
-                for (let i in res.data) {
-                  if (typeof this.roleFormRules[i] === 'undefined') {
-                    this.roleFormRules[i] = [];
-                  }
-                  this.roleFormRules[i].push({
-                    validator: (rule, value, callback) => {
-                      callback(new Error(res.data[i][0]));
-                    },
-                    trigger: 'blur'
-                  });
-                  this.$refs.roleForm.validateField(i);
-                }
-                this.roleFormRules = merge.recursive(true, {}, rules);
-              } else {
-                this.$message({
-                  message: res.message,
-                  type: 'warning'
-                });
               }
+              this.$message({
+                message: '客户端更新成功',
+                type: 'success'
+              });
+            } else if (res.code === codes.ValidateError) {
+              this.clientForm.status = `${this.clientForm.status}`;
+              let rules = merge.recursive(true, {}, this.clientFormRules);
+              for (let i in res.data) {
+                if (typeof this.clientFormRules[i] === 'undefined') {
+                  this.clientFormRules[i] = [];
+                }
+                this.clientFormRules[i].push({
+                  validator: (rule, value, callback) => {
+                    callback(new Error(res.data[i][0]));
+                  },
+                  trigger: 'blur'
+                });
+                this.$refs.clientForm.validateField(i);
+              }
+              this.clientFormRules = merge.recursive(true, {}, rules);
             } else {
-              let res = await api.PostRoles(this.roleForm);
-              if (res.code === codes.Success) {
-                this.showRoleFormModal = false;
-                this.roles.push(res.data);
-                this.$message({
-                  message: '角色添加成功',
-                  type: 'success'
-                });
-              } else if (res.code === codes.ValidateError) {
-                this.roleForm.status = `${this.roleForm.status}`;
-                let rules = merge.recursive(true, {}, this.roleFormRules);
-                for (let i in res.data) {
-                  if (typeof this.roleFormRules[i] === 'undefined') {
-                    this.roleFormRules[i] = [];
-                  }
-                  this.roleFormRules[i].push({
-                    validator: (rule, value, callback) => {
-                      callback(new Error(res.data[i][0]));
-                    },
-                    trigger: 'blur'
-                  });
-                  this.$refs.roleForm.validateField(i);
-                }
-                this.roleFormRules = merge.recursive(true, {}, rules);
-              } else {
-                this.$message({
-                  message: res.message,
-                  type: 'warning'
-                });
-              }
+              this.$message({
+                message: res.message,
+                type: 'warning'
+              });
             }
           } else {
-            console.log('error submit!!');
-            return false;
-          }
-        });
-      },
-      generatePermissionTree() {
-        if (this.modules.length > 0) {
-          this.appendPermissionTreeNode({
-            id: 0,
-            name: '全部权限'
-          });
-        }
-        this.modules.forEach(element => {
-          this.appendPermissionTreeNode(element);
-        });
-        if (this.roles.length > 0) {
-          this.selectRole = this.roles[0];
-          this.$refs.roleTable.setCurrentRow(this.roles[0]);
-        }
-      },
-      openRoleFormModal() {
-        this.showRoleFormModal = true;
-        this.roleForm = merge({}, roleForm);
-        if (this.$refs.roleForm) {
-          this.$refs.roleForm.resetFields();
-        }
-      },
-      openEditRoleModal(data) {
-        this.showRoleFormModal = true;
-        if (this.$refs.roleForm) {
-          this.$refs.roleForm.resetFields();
-        }
-        this.roleForm = merge({}, data);
-        this.roleForm.status = `${data.status}`;
-      },
-      openRolePermissionModal(data, checked) {
-        if (
-          data.type == 'permission' &&
-          checked &&
-          this.couldShowRolePermissionModal
-        ) {
-          this.rolePermissionForm = merge({}, rolePermissionForm);
-          this.showRolePermissionModal = true;
-          this.rolePermissionForm.id = data.id;
-          this.rolePermissionForm.code = data.code;
-          this.rolePermissionForm.name = data.label;
-          this.rolePermissionForm.limitFields = data.limitFields;
-          for (let i = 0; i < this.editRolePermissions.length; i++) {
-            if (this.editRolePermissions[i].permissionId === data.id) {
-              this.rolePermissionForm.limitString = this.editRolePermissions[
-                i
-              ].limitString;
-              this.rolePermissionForm.limitDescription = this.editRolePermissions[
-                i
-              ].limitDescription;
-            }
-          }
-        }
-      },
-      addRolePermission() {
-        let node = this.$refs.permissionTree.getNode({
-          id: this.rolePermissionForm.id
-        });
-        node.data.limitString = this.rolePermissionForm.limitString;
-        node.data.limitDescription = this.rolePermissionForm.limitDescription;
-        this.showRolePermissionModal = false;
-      },
-      appendPermissionTreeNode(element) {
-        if (element.id !== 0) {
-          this.$refs['permissionTree'].append({
-            id: 'module' + element.id,
-            label: element.name
-          }, {
-            id: 'module' + element.parentId
-          });
-        } else {
-          this.$refs['permissionTree'].append({
-            id: 'module' + element.id,
-            label: element.name,
-            code: element.code,
-            description: element.description
-          });
-        }
-      },
-      async savePermissions() {
-        let permissions = [];
-        this.$refs['permissionTree'].getCheckedNodes().forEach(element => {
-          if (typeof element.code !== 'undefined' && element.code) {
-            console.log(element);
-            permissions.push({
-              permissionId: element.id,
-              limitString: element.limitString,
-              limitDescription: element.limitDescription
-            });
-          }
-        });
-        if (permissions.length === 0) {
-          this.$message({
-            message: '请选择权限',
-            type: 'info'
-          });
-          return;
-        }
-        let res = await api.PostRolePermissions({
-          roleId: this.selectRole.id,
-          permissions: permissions
-        });
-        if (res.code === codes.Success) {
-          this.$message({
-            message: '权限绑定成功',
-            type: 'success'
-          });
-        } else {
-          this.$message({
-            message: res.message,
-            type: 'warning'
-          });
-        }
-      },
-      async saveAccounts() {
-        if (this.selectAccounts.length === 0) {
-          this.$message({
-            message: '请选择用户',
-            type: 'info'
-          });
-          return;
-        }
-        let res = await api.PostRolesAccounts({
-          id: this.selectRole.id,
-          accountIds: this.selectAccounts
-        });
-        if (res.code === codes.Success) {
-          this.$message({
-            message: '用户绑定成功',
-            type: 'success'
-          });
-        } else {
-          this.$message({
-            message: res.message,
-            type: 'warning'
-          });
-        }
-      },
-      async handleCurrentChange(val) {
-        this.selectRole = val;
-        for (let i = 0; i < this.permissions.length; i++) {
-          let node = this.$refs.permissionTree.getNode({
-            id: this.permissions[i].id
-          })
-          if (node) {
-            console.log(node)
-            node.data.limitString = "";
-            node.data.limitDescription = "";
-          }
-        }
-        let res = await api.GetRolePermissionIdsAndAccountIds({
-          id: val.id
-        });
-        if (res.code === codes.Success) {
-          if (this.$refs.permissionTree) {
-            let checkKeys = [];
-            this.editRolePermissions = res.data.permissions;
-            for (let i = 0; i < res.data.permissions.length; i++) {
-              checkKeys.push(res.data.permissions[i].permissionId);
-              let node = this.$refs.permissionTree.getNode({
-                id: res.data.permissions[i].permissionId
+            let res = await api.PostClient(this.clientForm);
+            if (res.code === codes.Success) {
+              this.showClientFormModal = false;
+              this.clients.push(res.data);
+              this.$message({
+                message: '客户端添加成功',
+                type: 'success'
               });
-              if (res.data.permissions[i].limitString) {
-                node.data.limitString = `${node.data.code}?${
-                  res.data.permissions[i].limitString
-                }`;
+            } else if (res.code === codes.ValidateError) {
+              this.clientForm.status = `${this.clientForm.status}`;
+              let rules = merge.recursive(true, {}, this.clientFormRules);
+              for (let i in res.data) {
+                if (typeof this.clientFormRules[i] === 'undefined') {
+                  this.clientFormRules[i] = [];
+                }
+                this.clientFormRules[i].push({
+                  validator: (rule, value, callback) => {
+                    callback(new Error(res.data[i][0]));
+                  },
+                  trigger: 'blur'
+                });
+                this.$refs.clientForm.validateField(i);
               }
-              if (res.data.permissions[i].limitDescription) {
-                node.data.limitDescription =
-                  res.data.permissions[i].limitDescription;
-              }
+              this.clientFormRules = merge.recursive(true, {}, rules);
+            } else {
+              this.$message({
+                message: res.message,
+                type: 'warning'
+              });
             }
-            this.$refs.permissionTree.setCheckedKeys(checkKeys);
           }
-          this.couldShowRolePermissionModal = false;
-          this.selectAccounts = res.data.accounts;
-          setTimeout(() => {
-            this.couldShowRolePermissionModal = true;
-          }, 50);
         } else {
-          this.$message({
-            message: res.message,
-            type: 'warning'
-          });
+          console.log('error submit!!');
+          return false;
         }
-      },
-      deleteRole(role) {
-        let $this = this;
-        this.$confirm(`删除 ${role.name} ？`, '删除角色', {
-          confirmButtonText: '是',
-          cancelButtonText: '否',
+      });
+    },
+    generateModuleTree() {
+      if (this.modules.length > 0) {
+        this.appendModuleTreeNode({
+          id: 0,
+          name: '全部模块'
+        });
+      }
+      this.modules.forEach(element => {
+        this.appendModuleTreeNode(element);
+      });
+      if (this.clients.length > 0) {
+        this.selectClient = this.clients[0];
+        this.$refs.roleTable.setCurrentRow(this.clients[0]);
+      }
+    },
+    openClientFormModal() {
+      this.showClientFormModal = true;
+      this.clientForm = merge({}, clientForm);
+      if (this.$refs.clientForm) {
+        this.$refs.clientForm.resetFields();
+      }
+    },
+    openEditClientModal(data) {
+      this.showClientFormModal = true;
+      if (this.$refs.clientForm) {
+        this.$refs.clientForm.resetFields();
+      }
+      this.clientForm = merge({}, data);
+      this.clientForm.status = `${data.status}`;
+    },
+    addClientModule() {
+      let node = this.$refs.moduleTree.getNode({
+        id: this.roleModuleForm.id
+      });
+      this.showClientModuleModal = false;
+    },
+    appendModuleTreeNode(element) {
+      if (element.id !== 0) {
+        this.$refs['moduleTree'].append(
+          {
+            id: element.id,
+            label: element.name
+          },
+          {
+            id: element.parentId
+          }
+        );
+      } else {
+        this.$refs['moduleTree'].append({
+          id: element.id,
+          label: element.name,
+          code: element.code,
+          description: element.description
+        });
+      }
+    },
+    async saveModules() {
+      let modules = [];
+      this.$refs['moduleTree'].getCheckedNodes().forEach(element => {
+        modules.push(element.id);
+      });
+      if (modules.length === 0) {
+        this.$message({
+          message: '请选择权限',
+          type: 'info'
+        });
+        return;
+      }
+      let res = await api.PutClientModules({
+        clientId: this.selectClient.id,
+        moduleIds: modules
+      });
+      if (res.code === codes.Success) {
+        this.$message({
+          message: '权限绑定成功',
+          type: 'success'
+        });
+      } else {
+        this.$message({
+          message: res.message,
           type: 'warning'
-        }).then(async() => {
-          let res = await api.DeleteRole(role.id);
-          if (res.code === codes.Success) {
-            for (let i = 0; i < this.roles.length; i++) {
-              if (this.roles[i].id === role.id) {
-                this.roles.splice(i, 1);
-                break;
-              }
-            }
-            this.showRoleFormModal = false;
-            this.$message({
-              type: 'success',
-              message: `已删除 ${role.name}`
+        });
+      }
+    },
+    async handleCurrentChange(val) {
+      this.selectClient = val;
+      let res = await api.GetClientModules({
+        id: val.id
+      });
+      if (res.code === codes.Success) {
+        if (this.$refs.moduleTree) {
+          let checkKeys = [];
+          // this.editClientModules = res.data.modules;
+          for (let i = 0; i < res.data.length; i++) {
+            checkKeys.push(res.data[i].moduleId);
+            let node = this.$refs.moduleTree.getNode({
+              id: res.data[i].moduleId
             });
           }
+          this.$refs.moduleTree.setCheckedKeys(checkKeys);
+        }
+      } else {
+        this.$message({
+          message: res.message,
+          type: 'warning'
         });
-      },
-      handleDragStart(node, ev) {
-        console.log('drag start', node);
-      },
-      handleDragEnter(draggingNode, dropNode, ev) {
-        console.log('tree drag enter: ', dropNode.label);
-      },
-      handleDragLeave(draggingNode, dropNode, ev) {
-        console.log('tree drag leave: ', dropNode.label);
-      },
-      handleDragOver(draggingNode, dropNode, ev) {
-        console.log('tree drag over: ', dropNode.label);
-      },
-      handleDragEnd(draggingNode, dropNode, dropType, ev) {
-        console.log('tree drag end: ', dropNode && dropNode.label, dropType);
-      },
-      handleDrop(draggingNode, dropNode, dropType, ev) {
-        console.log('tree drop: ', dropNode.label, dropType);
-      },
-      allowDrop(draggingNode, dropNode, type) {
-        // if (dropNode.data.label === '二级 3-1') {
-        //   return type !== 'inner';
-        // } else {
-        //   return true;
-        // }
-      },
-      allowDrag(draggingNode) {
-        // return draggingNode.data.label.indexOf('三级 3-2-2') === -1;
       }
+    },
+    deleteClient(client) {
+      let $this = this;
+      this.$confirm(`删除 ${client.clientName} ？`, '删除客户端', {
+        confirmButtonText: '是',
+        cancelButtonText: '否',
+        type: 'warning'
+      }).then(async () => {
+        let res = await api.DeleteClient(client.id);
+        if (res.code === codes.Success) {
+          for (let i = 0; i < this.clients.length; i++) {
+            if (this.clients[i].id === client.id) {
+              this.clients.splice(i, 1);
+              break;
+            }
+          }
+          this.showClientFormModal = false;
+          this.$message({
+            type: 'success',
+            message: `已删除 ${client.clientName}`
+          });
+        }
+      });
     }
-  };
+  }
+};
 </script>
 
 <style lang="scss">
-  #page-roles {
-    .el-aside {
-      padding-right: 30px;
-      .el-card__body {
-        padding: 0;
-      }
-      .el-table {
-        border-style: none;
-        border-radius: 0;
-      }
-      .el-table th,
-      .el-table tr {
-        cursor: pointer;
-      }
-    }
-    .el-main {
+#page-clients {
+  .el-aside {
+    padding-right: 30px;
+    .el-card__body {
       padding: 0;
-      .el-card__body {
-        padding: 0;
-      }
-      .el-table {
-        border-style: none;
-        border-radius: 0;
-      }
     }
-    .el-table td,
-    .el-table th {
-      padding: 5px;
+    .el-table {
+      border-style: none;
+      border-radius: 0;
     }
-    .el-transfer-panel {
-      width: calc(50% - 62px);
-    }
-    .icon-pencil {
-      font-size: 13px;
-    }
-    // role list style
-    .icon-pen5 {
-      color: #409eff;
-      font-size: 12px;
-      visibility: hidden;
-    }
-    .el-table__row:hover {
-      .icon-pen5 {
-        visibility: visible;
-      }
-    }
-    // tree style
-    .custom-tree-node {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 14px;
-      padding-right: 8px;
-      .el-button--text {
-        color: #a2a2a2;
-      }
-    }
-    .option-type {
-      position: relative;
-      top: 1px;
-      width: 80px;
-    }
-    .permission-code {
-      width: 500px;
-      text-align: left;
-      overflow: hidden;
-    }
-    .permission-description {
-      min-width: 200px;
-      text-align: left;
-    }
-    // form style
-    .limit-fields {
-      margin-bottom: -16px;
-      font-size: 12px;
-      color: #909090;
-    }
-    .el-input.is-disabled .el-input__inner {
-      color: #777777;
+    .el-table th,
+    .el-table tr {
+      cursor: pointer;
     }
   }
+  .el-main {
+    padding: 0;
+    .el-card__body {
+      padding: 0;
+    }
+    .el-table {
+      border-style: none;
+      border-radius: 0;
+    }
+  }
+  .el-table td,
+  .el-table th {
+    padding: 5px;
+  }
+  .el-transfer-panel {
+    width: calc(50% - 62px);
+  }
+  .icon-pencil {
+    font-size: 13px;
+  }
+  // role list style
+  .icon-pen5 {
+    color: #409eff;
+    font-size: 12px;
+    visibility: hidden;
+  }
+  .el-table__row:hover {
+    .icon-pen5 {
+      visibility: visible;
+    }
+  }
+  // clint info
+  .client-info {
+    padding: 20px;
+    dt,
+    dd {
+      float: left;
+    }
+    li {
+      list-style: none;
+      overflow: hidden;
+      line-height: 40px;
+    }
+    dt {
+      width: 100px;
+      color: #717171;
+      text-align: right;
+    }
+  }
+}
 </style>
 

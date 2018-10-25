@@ -23,13 +23,23 @@
         </template>
       </c-level>
     </header>
-    
-    
         <el-card class="box-card">
           <div slot="header" class="clearfix">
               <span>日志列表</span>
           </div>
-
+          <div v-show="size>10">
+          <br>
+          <el-pagination
+            background
+            layout="prev, pager, next,sizes"
+            @size-change="handleSizeChange"
+            @current-change="getResult"
+            :page-sizes="[10, 50, 100]"      
+            :page-size="size"
+            :total="count">
+          </el-pagination>
+          <br>
+          </div>
           <el-table
             :data="logs"
             border
@@ -83,7 +93,6 @@
           </el-pagination>
           <br>
         </el-card>
-
   </c-main>
 </template>
 
@@ -93,7 +102,6 @@ import * as api from './../../../src/api';
 import * as codes from './../../../src/codes';
 
 export default {
-  
   data() {
     return {
       logs: [],
@@ -113,7 +121,6 @@ export default {
       if (res.code === codes.Success) {
         this.logs = res.data.logs;
         this.count = res.data.count;
-
       }
     },
     handleSizeChange(size) {
@@ -137,14 +144,15 @@ export default {
   .el-table th {
     padding: 5px;
   }
-   .el-table__body tr.hover-row.el-table__row--striped>td, .el-table__body tr.hover-row>td {
-    background-color:transparent !important;
-    }
-    pre{
-      margin-bottom: 0;
-      padding: 15px;
-      border-radius: 5px;
-    }
+  .el-table__body tr.hover-row.el-table__row--striped > td,
+  .el-table__body tr.hover-row > td {
+    background-color: transparent !important;
+  }
+  pre {
+    margin-bottom: 0;
+    padding: 15px;
+    border-radius: 5px;
+  }
 }
 </style>
 

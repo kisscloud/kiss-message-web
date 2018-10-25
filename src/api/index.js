@@ -37,6 +37,11 @@ export const GetPageDashboardParams = (data, options) => {
   return ajax.get('/kiss-console/page/account/dashboard', data, options);
 };
 
+// 获取客户端页面参数
+export const GetPageClientsParams = (data, options) => {
+  return ajax.get('/kiss-console/page/account/clients', data, options);
+};
+
 // 获取用户页面参数
 export const GetPagePermissonsAccountsParams = (data, options) => {
   return ajax.get('/kiss-console/page/account/accounts', data, options);
@@ -181,7 +186,7 @@ export const PutClientModules = (data, options) => {
 
 // 获取客户端权限模块
 export const GetClientModules = (data, options) => {
-  return ajax.get(`/kiss-console/service/account/client/modules?clientId=${data.id}`, data, options);
+  return ajax.get(`/kiss-console/service/account/client/modules?id=${data.id}`, options);
 };
 
 // 获取客户端权限模块

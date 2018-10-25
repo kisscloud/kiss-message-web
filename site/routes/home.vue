@@ -68,45 +68,52 @@
 
     </c-row>
 
-    <c-panel title="访问统计">
+    <!-- <c-panel title="访问统计">
       <c-button-group slot="control">
         <c-button type="ghost" active>周</c-button>
         <c-button type="ghost">月</c-button>
         <c-button type="ghost">年</c-button>
       </c-button-group>
       <x-activity-chart />
-    </c-panel>
+    </c-panel> -->
 
     <c-row card>
       <c-col lg="24">
         <c-panel title="最近操作">
-          <a role="button" slot="control">更多</a>
-          <table class="table table--bordered table--hover table--responsive">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>用户</th>
-                <th>IP</th>
-                <th>操作对象</th>
-                <th class="u-text-right@md">Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(order, index) in slice('orders', 0, 6)" :key="order._id">
-                <th data-label="Id">
-                  <a role="button" v-text="index"></a>
-                </th>
-                <td data-label="User">{{users[order.user_id].name}}</td>
-                <td data-label="Fee"><code>{{order.fee}}</code></td>
-                <td data-label="Status">
-                  <c-badge type="success" v-if="order.payment == 'paid'">Paid</c-badge>
-                  <c-badge type="warning" v-else-if="order.status == 'unpaid'">Unpaid</c-badge>
-                  <c-badge v-else>Refunded</c-badge>
-                </td>
-                <td data-label="Date" class="u-text-right@md">{{order.created_at}}</td>
-              </tr>
-            </tbody>
-          </table>
+          <a role="button" slot="control"><router-link to="/permission/logs">更多</router-link></a>
+          <el-table
+            :data="recentOptionLogs.logs"
+            border
+            :hover="false"
+            style="width: 100%">
+            <el-table-column
+              prop="operatorName"
+              label="擦作者"
+              width="180">
+            </el-table-column>
+            <el-table-column
+              prop="createdAt"
+              label="操作时间"
+              width="240">
+            </el-table-column>
+            <el-table-column
+              prop="targetType"
+              label="操作对象"
+              width="180">
+            </el-table-column>
+            <el-table-column label="操作前的值">
+              <template slot-scope="scope">
+                 <pre v-if="scope.row.beforeValue"><code>{{ scope.row.beforeValue }}</code></pre>
+                 <span v-if="!scope.row.beforeValue">null</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作后的值">
+              <template slot-scope="scope">          
+                 <pre v-if="scope.row.afterValue"><code>{{ scope.row.afterValue }}</code></pre>
+                 <span v-if="!scope.row.afterValue">null</span>
+              </template>
+            </el-table-column>
+          </el-table>
         </c-panel>
       </c-col>
     </c-row>
@@ -130,7 +137,11 @@ export default {
       accountsCount: 0,
       rolesCount: 0,
       accountGroupsCount: 0,
-      permissionsCount: 0
+      permissionsCount: 0,
+      recentOptionLogs: {
+        logs: [],
+        count: 0
+      }
     };
   },
   async mounted() {
@@ -140,6 +151,7 @@ export default {
       this.accountGroupsCount = res.data.accountGroupsCount;
       this.rolesCount = res.data.rolesCount;
       this.permissionsCount = res.data.permissionsCount;
+      this.recentOptionLogs = res.data.recentOptionLogs;
     }
   },
   methods: {
