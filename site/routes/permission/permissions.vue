@@ -105,12 +105,16 @@
               label="权限码">
             </el-table-column>
             <el-table-column
-              prop="limitFields"
-              label="权限描述">
-            </el-table-column>
-            <el-table-column
               prop="statusText"
               label="状态">
+            </el-table-column>
+            <el-table-column
+              align="left"
+              label="权限描述"
+              width="320">
+              <span slot-scope="scope" style="width:100%;">
+                {{ scope.row.limitFields || '-' }}
+              </span>
             </el-table-column>
             <el-table-column
               align="center"
@@ -351,6 +355,7 @@ export default {
             if (res.code === codes.Success) {
               this.showPermissionFormModal = false;
               this.permissions.push(res.data);
+              this.showPermissions.push(res.data);
               this.$message({
                 message: '权限添加成功',
                 type: 'success'
