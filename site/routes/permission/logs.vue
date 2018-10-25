@@ -72,14 +72,14 @@
                  <span v-if="!scope.row.afterValue">null</span>
               </template>
             </el-table-column>
-            <el-table-column
+            <!-- <el-table-column
               fixed="right"
               label="操作"
               width="100">
               <template slot-scope="scope">
                 <el-button type="text" size="small">恢复</el-button>
               </template>
-            </el-table-column>
+            </el-table-column> -->
           </el-table>
           <br>
           <el-pagination
