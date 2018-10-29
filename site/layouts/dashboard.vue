@@ -32,7 +32,9 @@ export default {
   data() {
     return {
       isLoading: false,
-      title: typeof window.config != "undefined" &&  window.config.title || '统一账户中心'
+      title:
+        (typeof window.config != 'undefined' && window.config.title) ||
+        '统一账户中心'
     };
   }
 };
@@ -51,5 +53,8 @@ export default {
     font-size: 12px;
     margin-left: 7px;
   }
+}
+.el-message-box__wrapper {
+  top: -30%;
 }
 </style>
