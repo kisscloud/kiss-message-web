@@ -23,6 +23,7 @@
 <script>
 import Navigation from '../components/Navigation.vue';
 import Navbar from '../components/Navbar.vue';
+
 export default {
   name: 'Dashboard',
   components: {

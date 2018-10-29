@@ -76,14 +76,13 @@ export default {
 
       let res = await api.AuthLogin(this.form);
       if (res.code === codes.Success) {
-        localStorage.setItem('accessToken', res.data.accessToken);
-        localStorage.setItem('accessTokenExpiredAt', res.data.expiredAt);
         if (this.source) {
-          window.location.href = getRedirectSource(
-            res.data.accessToken,
-            res.data.expiredAt
+          window.location.href = this.getRedirectSource(
+            res.data.authorizationCode
           );
         } else {
+          localStorage.setItem('accessToken', res.data.accessToken);
+          localStorage.setItem('accessTokenExpiredAt', res.data.expiredAt);
           this.$router.push({ path: '/' });
         }
       } else {
@@ -93,13 +92,13 @@ export default {
         });
       }
     },
-    getRedirectSource(accessToken, accessTokenExpiredAt) {
+    getRedirectSource(authorizationCode) {
       let source = this.source;
       if (source.indexOf('?') !== '-1') {
-        return `${source}?accessToken=${accessToken}&accessTokenExpiredAt=${accessTokenExpiredAt}`;
+        return `${source}?authorizationCode=${authorizationCode}`;
       }
 
-      return `${source}&accessToken=${accessToken}&accessTokenExpiredAt=${accessTokenExpiredAt}`;
+      return `${source}&authorizationCode=${authorizationCode}`;
     }
   }
 };
