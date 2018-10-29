@@ -7,16 +7,16 @@
         </div>
         <p class="message__title">OOPS!</p>
         <p class="message__content">
-          Sorry! The page you are looking for doesn't exist.
+          页面不存在
         </p>
-        <c-button type="primary" size="lg" @click.prevent="goHome" smart>Go Home!</c-button>
+        <!-- <c-button type="primary" size="lg" @click.prevent="goHome" smart>回到主页</c-button> -->
       </section>
     </c-content>
   </c-app>
 </template>
 
 <script>
-export default {
+export default {  
   name: 'ErrorView',
   methods: {
     goHome() {
