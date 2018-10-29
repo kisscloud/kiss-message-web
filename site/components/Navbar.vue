@@ -55,6 +55,8 @@ export default {
       this.$root.siderOpen = !this.$root.siderOpen;
     },
     logout() {
+      window.localStorage.removeItem('accessToken');
+      window.localStorage.removeItem('accessTokenExpiredAt');
       this.$router.push({ path: '/auth/login' });
     }
   }

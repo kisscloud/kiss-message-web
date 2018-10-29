@@ -10,6 +10,13 @@ import 'izitoast/dist/css/izitoast.min.css';
 import './styles/global.scss';
 import permissions from './permissions';
 import can from '../src/services/can';
+import auth from '../src/auth';
+
+auth();
+
+setInterval(() => {
+  auth();
+}, 1000);
 
 Vue.use(ElementUI);
 Vue.use(VueRouter);
@@ -27,13 +34,12 @@ const router = new VueRouter({
 Vue.prototype.$auth = permissions;
 
 const app = new Vue({
-  // eslint-disable-line no-unused-vars
   data: {
     siderOpen: false
   },
   router,
   render(h) {
-    return <router-view />;
+  return <router-view/> ;
   }
 }).$mount('#app');
 
@@ -62,9 +68,11 @@ const hidePageLoader = () => {
 };
 
 router.beforeEach((to, from, next) => {
+
   showPageLoader();
   next();
 });
+
 router.beforeResolve((to, from, next) => {
   hidePageLoader();
   next();
