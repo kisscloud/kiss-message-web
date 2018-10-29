@@ -193,3 +193,8 @@ export const GetClientModules = (data, options) => {
 export const GetOperationLogs = (query, options) => {
   return ajax.get(`/kiss-console/service/account/operation/logs?page=${query.page}&size=${query.size}`, options);
 };
+
+// 查看客户端秘钥
+export const GetClientSecret = (data, options) => {
+  return ajax.post(`/kiss-console/service/account/client/secret`, data, options);
+};

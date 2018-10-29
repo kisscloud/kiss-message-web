@@ -16,7 +16,7 @@ auth();
 
 setInterval(() => {
   auth();
-}, 1000);
+}, 1500);
 
 Vue.use(ElementUI);
 Vue.use(VueRouter);

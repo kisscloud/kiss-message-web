@@ -46,10 +46,16 @@ export default {
   data() {
     return {
       form: {
+        clientId: '',
         username: '',
         password: ''
-      }
+      },
+      source: null
     };
+  },
+  mounted() {
+    this.form.clientId = this.$route.query.client_id;
+    this.source = this.$route.query.source;
   },
   methods: {
     async login() {
@@ -72,13 +78,28 @@ export default {
       if (res.code === codes.Success) {
         localStorage.setItem('accessToken', res.data.accessToken);
         localStorage.setItem('accessTokenExpiredAt', res.data.expiredAt);
-        this.$router.push({ path: '/' });
+        if (this.source) {
+          window.location.href = getRedirectSource(
+            res.data.accessToken,
+            res.data.expiredAt
+          );
+        } else {
+          this.$router.push({ path: '/' });
+        }
       } else {
         this.$message({
           message: res.message,
           type: 'warning'
         });
       }
+    },
+    getRedirectSource(accessToken, accessTokenExpiredAt) {
+      let source = this.source;
+      if (source.indexOf('?') !== '-1') {
+        return `${source}?accessToken=${accessToken}&accessTokenExpiredAt=${accessTokenExpiredAt}`;
+      }
+
+      return `${source}&accessToken=${accessToken}&accessTokenExpiredAt=${accessTokenExpiredAt}`;
     }
   }
 };

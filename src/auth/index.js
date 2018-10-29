@@ -20,6 +20,8 @@ export default function () {
     redirect = true;
   }
 
+  let target = window.config.ACCOUNT_CENTER_HOST;
+
   if (redirect) {
     if (window.location.href.indexOf('/auth/') === -1) {
       toast.info({

@@ -79,7 +79,7 @@
                 </li>
                 <li>
                   <dt>Client Secret</dt>
-                  <dd>{{ selectClient.clientSecret || '********' }}</dd>
+                  <dd>{{ selectClient.clientSecret || '********' }}  <el-button @click="openPasswordModal()" type="text"  size="mini" class="icon-eye" circle></el-button></dd>
                 </li>
               </dl>
             </el-tab-pane>
@@ -106,6 +106,18 @@
       </div>
     </el-dialog>
 
+    <el-dialog title="查看私钥" :visible.sync="showPassowrdFormModal" width="40%">
+      <el-form :model="passwordForm" :rules="passwordFormRules" ref="passwordForm" :validate-on-rule-change="false">
+        <el-form-item label="用户密码" label-width="120px" prop="password">
+          <el-input type="password" v-model="passwordForm.password" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="showPassowrdFormModal = false">取 消</el-button>
+        <el-button type="primary" @click="submitPasswordForm()">查看</el-button>
+      </div>
+    </el-dialog>
+
   </c-main>
 </template>
 
@@ -113,6 +125,7 @@
 import * as api from '../../src/api';
 import * as codes from '../../src/codes';
 import merge from 'merge';
+import Vue from 'vue';
 
 var clientForm = {
   clientName: null,
@@ -127,6 +140,7 @@ export default {
     return {
       showClientFormModal: false,
       showClientModuleModal: false,
+      showPassowrdFormModal: false,
       tabActiveName: 'first',
       selectClient: {},
       selectModules: [],
@@ -144,6 +158,18 @@ export default {
           {
             required: true,
             message: '请输入客户端名称',
+            trigger: 'change'
+          }
+        ]
+      },
+      passwordForm: {
+        password: null
+      },
+      passwordFormRules: {
+        password: [
+          {
+            required: true,
+            message: '请输入用户密码',
             trigger: 'change'
           }
         ]
@@ -275,6 +301,29 @@ export default {
       }
       this.clientForm = merge({}, data);
       this.clientForm.status = `${data.status}`;
+    },
+    openPasswordModal() {
+      let $this = this;
+      this.$prompt(null, '输入用户密码', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        inputType: 'password'
+      }).then(async ({ value }) => {
+        let res = await api.GetClientSecret({
+          id: $this.selectClient.id,
+          password: value
+        });
+        if (res.code === codes.Success) {
+          $this.showPassowrdFormModal = false;
+          $this.passwordForm.password = null;
+          $this.$set($this.selectClient, 'clientSecret', res.data);
+        } else {
+          this.$message({
+            message: res.message,
+            type: 'warning'
+          });
+        }
+      });
     },
     addClientModule() {
       let node = this.$refs.moduleTree.getNode({
@@ -445,6 +494,10 @@ export default {
       color: #717171;
       text-align: right;
     }
+  }
+
+  .icon-eye {
+    color: #000;
   }
 }
 </style>
