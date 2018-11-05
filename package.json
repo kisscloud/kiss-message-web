@@ -89,6 +89,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "babel-polyfill": "^6.26.0",
+    "base-64": "^0.1.0",
     "chart.js": "^2.7.2",
     "core-js": "^2.5.7",
     "element-ui": "^2.4.8",

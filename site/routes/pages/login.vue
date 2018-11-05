@@ -41,6 +41,7 @@
 <script>
 import * as api from './../../../src/api';
 import * as codes from './../../../src/codes';
+import base64 from 'base-64';
 
 export default {
   data() {
@@ -50,12 +51,14 @@ export default {
         username: '',
         password: ''
       },
-      source: null
+      source: "",
+      target: ""
     };
   },
   mounted() {
     this.form.clientId = this.$route.query.client_id;
     this.source = this.$route.query.source;
+    this.target = this.$route.query.target;
   },
   methods: {
     async login() {
@@ -93,12 +96,16 @@ export default {
       }
     },
     getRedirectSource(authorizationCode) {
-      let source = this.source;
+      let source = base64.decode(this.source);
       if (source.indexOf('?') !== '-1') {
-        return `${source}?authorizationCode=${authorizationCode}`;
+        return `${source}?authorizationCode=${authorizationCode}&target=${
+          this.target
+        }`;
       }
 
-      return `${source}&authorizationCode=${authorizationCode}`;
+      return `${source}&authorizationCode=${authorizationCode}&target=${
+        this.target
+      }`;
     }
   }
 };
