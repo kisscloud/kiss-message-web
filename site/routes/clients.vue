@@ -75,7 +75,7 @@
                 </li>
                 <li>
                   <dt>Client ID</dt>
-                  <dd>{{ selectClient.clientID }}</dd>
+                  <dd>{{ selectClient.clientId }}</dd>
                 </li>
                 <li>
                   <dt>Client Secret</dt>
