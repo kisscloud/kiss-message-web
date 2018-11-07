@@ -152,6 +152,7 @@
             <el-option label="接口" value="1"></el-option>
             <el-option label="页面" value="2"></el-option>
             <el-option label="组件" value="3"></el-option>
+            <el-option label="授权" value="4"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="权限码" :label-width="formLabelWidth" prop="code">

@@ -409,10 +409,15 @@ export default {
       let node = this.$refs.permissionTree.getNode({
         id: this.rolePermissionForm.id
       });
-      if(this.rolePermissionForm.limitString){
-        node.data.limitString =this.rolePermissionForm.code +'?' + this.rolePermissionForm.limitString;
-      }else{
-        node.data.limitString =this.rolePermissionForm.code
+      if (this.rolePermissionForm.type === 1) {
+        if (this.rolePermissionForm.limitString) {
+          node.data.limitString =
+            this.rolePermissionForm.code +
+            '?' +
+            this.rolePermissionForm.limitString;
+        } else {
+          node.data.limitString = this.rolePermissionForm.code;
+        }
       }
       node.data.limitDescription = this.rolePermissionForm.limitDescription;
       this.showRolePermissionModal = false;
@@ -453,7 +458,7 @@ export default {
         if (typeof element.code !== 'undefined' && element.code) {
           permissions.push({
             permissionId: element.id,
-            limitString:  element.limitString,
+            limitString: element.limitString,
             limitDescription: element.limitDescription
           });
         }
