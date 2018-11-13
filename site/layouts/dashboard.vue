@@ -35,7 +35,7 @@ export default {
       isLoading: false,
       title:
         (typeof window.config != 'undefined' && window.config.title) ||
-        '统一账户中心'
+        '消息服务'
     };
   }
 };
@@ -44,7 +44,7 @@ export default {
 <style lang="scss">
 .app__brand {
   img {
-    width: 20px !important;
+    width: 15px !important;
     position: relative;
     top: -1px;
   }

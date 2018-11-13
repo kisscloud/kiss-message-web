@@ -6,11 +6,11 @@
         <c-panel>
           <c-level>
              <template slot="left">
-              <i class="icon-user icon-2x u-color-primary"></i>
+              <i class="icon-shield2 icon-2x u-color-primary"></i>
             </template>
             <template slot="right">
               <div class="u-text-right">
-                <div class="u-text-muted">在职成员</div>
+                <div class="u-text-muted">客户端</div>
                 <div class="u-h1">{{ accountsCount }}</div>
               </div>
             </template>
@@ -22,11 +22,11 @@
         <c-panel>
           <c-level>
             <template slot="left">
-              <i class="icon-tree3 icon-2x u-color-success"></i>
+              <i class="icon-embed2 icon-2x u-color-primary"></i>
             </template>
             <template slot="right">
               <div class="u-text-right">
-                <div class="u-text-muted">部门数</div>
+                <div class="u-text-muted">消息模板</div>
                 <div class="u-h1">{{ accountGroupsCount }}</div>
               </div>
             </template>
@@ -38,11 +38,11 @@
         <c-panel>
           <c-level>
             <template slot="left">
-              <i class="icon-user-tie icon-2x u-color-info"></i>
+              <i class="icon-soundcloud icon-2x u-color-primary"></i>
             </template>
             <template slot="right">
               <div class="u-text-right">
-                <div class="u-text-muted">角色数</div>
+                <div class="u-text-muted">今日短信</div>
                 <div class="u-h1">{{ rolesCount }}</div>
               </div>
             </template>
@@ -54,11 +54,11 @@
         <c-panel>
           <c-level>
             <template slot="left">
-              <i class="icon-key icon-2x u-color-danger"></i>
+              <i class="icon-mail4 icon-2x u-color-primary"></i>
             </template>
             <template slot="right">
               <div class="u-text-right">
-                <div class="u-text-muted">权限数</div>
+                <div class="u-text-muted">今日邮件</div>
                 <div class="u-h1">{{ permissionsCount }}</div>
               </div>
             </template>
@@ -79,7 +79,7 @@
 
     <c-row card>
       <c-col lg="24">
-        <c-panel title="最近操作">
+        <c-panel title="最近发送">
           <a role="button" slot="control"><router-link to="/permission/logs">更多</router-link></a>
           <el-table
             :data="recentOptionLogs.logs"

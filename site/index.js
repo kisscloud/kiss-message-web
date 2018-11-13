@@ -12,10 +12,10 @@ import permissions from './permissions';
 import can from '../src/services/can';
 import auth from '../src/auth';
 
-auth();
+// auth();
 
 setInterval(() => {
-  auth();
+  // auth();
 }, 1500);
 
 Vue.use(ElementUI);
@@ -68,7 +68,7 @@ const hidePageLoader = () => {
 };
 
 router.beforeEach((to, from, next) => {
-
+  
   showPageLoader();
   next();
 });
