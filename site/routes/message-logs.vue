@@ -8,7 +8,7 @@
               <i class="icon-footprint"></i>
             </div> -->
             <div class="cell__content">
-              <h1 class="toolbar__title">操作日志 <span>用户带有权限的操作日志</span></h1>
+              <h1 class="toolbar__title">发送日志 <span>消息的发送日志列表</span></h1>
             </div>
           </div>
         </template>
@@ -98,8 +98,8 @@
 
 <script>
 import Vue from 'vue';
-import * as api from './../../../src/api';
-import * as codes from './../../../src/codes';
+import * as api from './../../src/api';
+import * as codes from './../../src/codes';
 
 export default {
   data() {

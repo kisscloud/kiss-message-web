@@ -51,23 +51,7 @@
 
       <el-main>
           <el-tabs type="border-card" v-model="tabActiveName">
-            <el-tab-pane label="权限模块" name="first">
-              <el-tree
-                :data="moduleTree"
-                ref="moduleTree"
-                show-checkbox
-                node-key="id"
-                :default-expand-all="true"
-                :default-checked-keys="selectModules"
-                :props="defaultProps">
-                <span class="custom-tree-node" slot-scope="{ node, data }">
-                  <span>{{ data.label }}</span>
-                </span>
-              </el-tree>
-              <br>
-              <el-button v-show="moduleTree.length != 0" size="small" type="primary" @click="saveModules()">绑定模块</el-button>
-            </el-tab-pane>
-            <el-tab-pane label="客户端信息" name="second">
+            <el-tab-pane label="客户端信息" name="first">
               <dl class="client-info">
                 <li>
                   <dt>客户端名称</dt>
@@ -82,6 +66,34 @@
                   <dd>{{ selectClient.clientSecret || '********' }}  <el-button @click="openPasswordModal()" type="text"  size="mini" class="icon-eye" circle></el-button></dd>
                 </li>
               </dl>
+            </el-tab-pane>
+            <el-tab-pane label="授权对象" name="second">              
+              <el-table
+                :data="authServers"
+                id="authServersTable"
+                >
+                <el-table-column
+                  prop="ip"
+                  label="IP 地址"
+                  min-width="120"
+                  >
+                </el-table-column>
+                <el-table-column
+                  prop="remark"
+                  width="180"
+                  label="备注"
+                >
+                </el-table-column>
+                <el-table-column
+                  width="180"
+                  align="center"
+                  label="操作">
+                  <span slot-scope="scope" style="text-align: center;display: block;width: 100%;">
+                    <el-button type="text" size="mini" @click="deleteAuthServer(scope.row)">删除</el-button>
+                  </span>
+                </el-table-column>                
+              </el-table>           
+              <el-button size="small" type="text" style="margin-left:7px;margin-top:10px;">添加对象</el-button>   
             </el-tab-pane>
           </el-tabs>
       </el-main>
@@ -179,7 +191,17 @@ export default {
       defaultProps: {
         children: 'children',
         label: 'label'
-      }
+      },
+      authServers: [
+        {
+          ip: '192.168.0.102',
+          remark: 'Nest1'
+        },
+        {
+          ip: '192.168.0.103',
+          remark: 'Nest2'
+        }
+      ]
     };
   },
   async mounted() {

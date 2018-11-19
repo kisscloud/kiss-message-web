@@ -4,9 +4,12 @@
     <c-menu-item v-if="can($auth.DashboardPage)" index="/" icon="icon-compass2" label="主面板" />
     <c-menu-heading label="服务管理" />
     <c-menu-item index="/clients" icon="icon-shield2" label="授权管理" />
-    <c-menu-item index="/templates" icon="icon-embed2" label="消息模板" />
-    <c-menu-item index="/operation/logs" icon="icon-stack2" label="操作日志" />
-    <c-menu-item index="/send/logs" icon="icon-file-stats" label="发送日志" />
+    <c-submenu index="/permission" icon="icon-embed2" label="消息模板">
+      <c-menu-item index="/mail/templates" label="邮件模板" />
+      <c-menu-item index="/sms/templates" label="短信模板" />
+    </c-submenu>
+    <c-menu-item index="/message/logs" icon="icon-file-stats" label="发送日志" />
+    <c-menu-item index="/operation/logs" icon="icon-stack2" label="操作日志" />    
   </c-menu>
 </template>
 
