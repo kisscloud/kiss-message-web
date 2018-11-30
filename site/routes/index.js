@@ -12,8 +12,10 @@ const ErrorView = () => import('./pages/error.vue');
 const ClientsView = () => import('./clients.vue');
 const MailTemplatesView = () => import('./mail-templates.vue');
 const SMSTemplatesView = () => import('./sms-templates.vue');
+const SMSLogsView = () => import('./sms-logs.vue');
+const MailLogsView = () => import('./mail-logs.vue');
 const OperationLogsView = () => import('./operation-logs.vue');
-const MessageLogsView = () => import('./message-logs.vue');
+
 
 export default [{
     path: '/auth/login',
@@ -41,12 +43,16 @@ export default [{
         component: SMSTemplatesView
       },
       {
-        path: '/operation/logs',
-        component: OperationLogsView
+        path: '/sms/logs',
+        component: SMSLogsView
       },
       {
-        path: '/message/logs',
-        component: MessageLogsView
+        path: '/mail/logs',
+        component: MailLogsView
+      },
+      {
+        path: '/operation/logs',
+        component: OperationLogsView
       },
       {
         path: '',

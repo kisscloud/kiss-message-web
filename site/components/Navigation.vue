@@ -8,7 +8,10 @@
       <c-menu-item index="/mail/templates" label="邮件模板" />
       <c-menu-item index="/sms/templates" label="短信模板" />
     </c-submenu>
-    <c-menu-item index="/message/logs" icon="icon-file-stats" label="发送日志" />
+    <c-submenu index="/permission" icon="icon-file-stats" label="发送日志">
+      <c-menu-item index="/mail/logs" label="邮件日志" />
+      <c-menu-item index="/sms/logs" label="短信日志" />
+    </c-submenu>
     <c-menu-item index="/operation/logs" icon="icon-stack2" label="操作日志" />    
   </c-menu>
 </template>

@@ -42,7 +42,7 @@
             </template>
             <template slot="right">
               <div class="u-text-right">
-                <div class="u-text-muted">今日短信</div>
+                <div class="u-text-muted">今日发送短信</div>
                 <div class="u-h1">{{ rolesCount }}</div>
               </div>
             </template>
@@ -58,7 +58,7 @@
             </template>
             <template slot="right">
               <div class="u-text-right">
-                <div class="u-text-muted">今日邮件</div>
+                <div class="u-text-muted">今日发送邮件</div>
                 <div class="u-h1">{{ permissionsCount }}</div>
               </div>
             </template>

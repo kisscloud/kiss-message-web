@@ -61,10 +61,6 @@
                   <dt>Client ID</dt>
                   <dd>{{ selectClient.clientId }}</dd>
                 </li>
-                <li>
-                  <dt>Client Secret</dt>
-                  <dd>{{ selectClient.clientSecret || '********' }}  <el-button @click="openPasswordModal()" type="text"  size="mini" class="icon-eye" circle></el-button></dd>
-                </li>
               </dl>
             </el-tab-pane>
             <el-tab-pane label="授权对象" name="second">              

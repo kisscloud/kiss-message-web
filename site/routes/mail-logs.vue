@@ -8,7 +8,7 @@
               <i class="icon-footprint"></i>
             </div> -->
             <div class="cell__content">
-              <h1 class="toolbar__title">发送日志 <span>消息的发送日志列表</span></h1>
+              <h1 class="toolbar__title">邮件发送日志</h1>
             </div>
           </div>
         </template>
