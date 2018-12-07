@@ -2,7 +2,7 @@
   <c-app :sider-open="$root.siderOpen">
     <c-sider>
       <c-brand class="u-bg-primary" slot="start">
-        <img style="width: 30px;" src="../assets/logo-white.svg">
+        <!-- <img style="width: 30px;" src="../assets/logo-white.svg"> -->
         <span>{{title}}</span>
       </c-brand>
       <Navigation />
@@ -35,7 +35,7 @@ export default {
       isLoading: false,
       title:
         (typeof window.config != 'undefined' && window.config.title) ||
-        '消息服务'
+        '有币支付管理后台'
     };
   }
 };

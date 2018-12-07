@@ -46,7 +46,7 @@ module.exports = merge(baseWebpackConfig, {
     historyApiFallback: true,
     hot: true,
     contentBase: false, // since we use CopyWebpackPlugin.
-    port: 1996,
+    port: 1997,
     quiet: true,
     compress: true,
     overlay: true,
