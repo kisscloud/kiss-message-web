@@ -39,7 +39,9 @@
         </el-table-column>
       </el-table>
     </el-card>
-    <el-dialog :title="currencyForm.id? '编辑币种': '添加币种'" :visible.sync="showCurrencyDialog">
+    <el-dialog :title="currencyForm.id? '编辑币种': '添加币种'"
+      :show-close="!loading" :close-on-click-modal="!loading" :close-on-press-escape="!loading"
+     :visible.sync="showCurrencyDialog">
       <el-form
         :model="currencyForm"
         :rules="currencyFormRules"
